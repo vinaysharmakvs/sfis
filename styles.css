@@ -128,9 +128,9 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(14px, 2vw, 28px);
+  gap: clamp(9px, 1.35vw, 22px);
   color: var(--soft);
-  font-size: 0.92rem;
+  font-size: 0.88rem;
 }
 
 .desktop-nav a {
@@ -432,6 +432,14 @@ textarea {
   width: 100%;
 }
 
+.hero-home .hero-content {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.hero-home .hero-copy-wrap {
+  max-width: 720px;
+}
+
 @keyframes pulse-dot {
   0%,
   100% {
@@ -459,6 +467,326 @@ textarea {
 .media-copy p {
   color: var(--soft);
   line-height: 1.72;
+}
+
+.blueprint-teaser {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.48fr);
+  gap: clamp(20px, 4vw, 48px);
+  align-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 20%, rgba(42, 219, 180, 0.18), transparent 28%),
+    linear-gradient(135deg, #f8fbf4 0%, #eff7ee 48%, #fff4dc 100%);
+}
+
+.blueprint-teaser p {
+  color: rgba(19, 32, 29, 0.68);
+  line-height: 1.7;
+}
+
+.spark-copy {
+  max-width: 820px;
+}
+
+.spark-tags,
+.spark-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.spark-tags span {
+  padding: 9px 12px;
+  color: #15342d;
+  border: 1px solid rgba(26, 88, 72, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.spark-preview {
+  display: grid;
+  gap: 14px;
+  padding: clamp(20px, 3vw, 30px);
+  color: var(--soft);
+  border: 1px solid rgba(198, 255, 230, 0.18);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(7, 17, 15, 0.96), rgba(18, 50, 42, 0.94));
+  box-shadow: 0 28px 70px rgba(7, 17, 15, 0.22);
+}
+
+.spark-preview h3 {
+  color: var(--white);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+.spark-badge {
+  justify-self: start;
+  padding: 7px 10px;
+  color: var(--night);
+  border-radius: 999px;
+  background: var(--gold);
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.spark-score {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid rgba(198, 255, 230, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.spark-score strong {
+  color: var(--teal);
+  font-size: clamp(2.4rem, 7vw, 4.4rem);
+  line-height: 0.88;
+}
+
+.spark-status strong {
+  font-size: clamp(1.35rem, 4vw, 2.15rem);
+  line-height: 1;
+}
+
+.spark-score span {
+  color: var(--soft);
+  font-weight: 850;
+}
+
+.spark-preview ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--soft);
+  line-height: 1.55;
+}
+
+.blueprint-hero {
+  background:
+    linear-gradient(135deg, rgba(7, 17, 15, 0.86), rgba(14, 36, 33, 0.92)),
+    url("assets/circuit-campus.png") center / cover;
+}
+
+.blueprint-tool {
+  background:
+    radial-gradient(circle at 85% 10%, rgba(42, 219, 180, 0.15), transparent 30%),
+    #07110f;
+}
+
+.blueprint-form,
+.blueprint-gate,
+.blueprint-report {
+  display: grid;
+  gap: 18px;
+}
+
+.blueprint-step,
+.blueprint-gate,
+.report-hero-card,
+.report-grid article,
+.score-panel,
+.match-card {
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.blueprint-fields,
+.choice-grid,
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.blueprint-fields label,
+.blueprint-lead-form label,
+.choice-grid label {
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  font-weight: 850;
+}
+
+.blueprint-fields input,
+.blueprint-fields select,
+.blueprint-lead-form input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.blueprint-error {
+  margin: 0;
+  padding: 14px 16px;
+  color: #ffe9e1;
+  border: 1px solid rgba(255, 117, 90, 0.7);
+  border-radius: 8px;
+  background: rgba(255, 82, 54, 0.14);
+  box-shadow: 0 16px 40px rgba(80, 10, 0, 0.2);
+  font-weight: 850;
+  line-height: 1.55;
+}
+
+.blueprint-error[hidden] {
+  display: none;
+}
+
+.blueprint-fields label.is-invalid,
+.choice-grid fieldset.is-invalid legend {
+  color: #ffd0c2;
+}
+
+.blueprint-fields label.is-invalid input,
+.blueprint-fields label.is-invalid select,
+.choice-grid fieldset.is-invalid {
+  border-color: rgba(255, 117, 90, 0.9);
+  background: rgba(255, 82, 54, 0.1);
+}
+
+.choice-grid fieldset {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.choice-grid legend {
+  padding: 0 8px;
+  color: var(--gold);
+  font-weight: 950;
+}
+
+.choice-grid label {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  color: var(--soft);
+  font-weight: 700;
+}
+
+.blueprint-note {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.blueprint-gate {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.75fr);
+  align-items: center;
+  margin-top: 28px;
+  background: linear-gradient(135deg, rgba(42, 219, 180, 0.13), rgba(240, 189, 79, 0.1));
+}
+
+.blueprint-lead-form {
+  display: grid;
+  gap: 12px;
+}
+
+.blueprint-report {
+  margin-top: 28px;
+}
+
+.report-hero-card h2 {
+  color: var(--gold);
+}
+
+.archetype-score {
+  display: inline-grid;
+  gap: 6px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.archetype-score span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.archetype-score strong {
+  color: var(--teal);
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  line-height: 0.9;
+}
+
+.report-grid ul,
+.report-grid li {
+  color: var(--soft);
+  line-height: 1.7;
+}
+
+.score-bars {
+  display: grid;
+  gap: 12px;
+}
+
+.score-row {
+  display: grid;
+  gap: 8px;
+}
+
+.score-row > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--soft);
+  font-weight: 850;
+}
+
+.score-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.score-track span {
+  display: block;
+  height: 100%;
+  width: var(--score);
+  background: linear-gradient(90deg, var(--teal), var(--gold));
+  border-radius: inherit;
+}
+
+.match-card {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  background: linear-gradient(135deg, rgba(42, 219, 180, 0.16), rgba(240, 189, 79, 0.12));
+}
+
+.match-card strong {
+  color: var(--gold);
+  font-size: clamp(4rem, 10vw, 8rem);
+  line-height: 0.9;
+}
+
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .video-card {
@@ -1200,6 +1528,105 @@ h3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.location-switch,
+.location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.location-switch button {
+  min-height: 44px;
+  padding: 0 16px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.location-switch button.is-active {
+  color: var(--night);
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--teal), var(--gold));
+  box-shadow: 0 14px 36px rgba(51, 241, 194, 0.22);
+}
+
+.contact-section .contact-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.contact-card {
+  position: relative;
+}
+
+.contact-card span {
+  display: inline-flex;
+  margin-bottom: 10px;
+  padding: 7px 9px;
+  color: #12362e;
+  border-radius: 999px;
+  background: rgba(51, 241, 194, 0.18);
+  font-size: 0.75rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.contact-card.is-active {
+  border-color: rgba(51, 241, 194, 0.7);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(236, 255, 247, 0.98));
+  box-shadow: 0 22px 70px rgba(51, 241, 194, 0.2);
+}
+
+.contact-card.is-active::after {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 14px;
+  height: 14px;
+  content: "";
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 7px rgba(51, 241, 194, 0.16);
+}
+
+.map-frame {
+  position: relative;
+  min-height: 420px;
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(198, 255, 230, 0.2);
+  border-radius: 8px;
+  background: #07110f;
+  box-shadow: var(--shadow);
+}
+
+.map-frame::before {
+  position: absolute;
+  z-index: 1;
+  inset: 14px auto auto 14px;
+  content: "Live location view";
+  padding: 8px 10px;
+  color: var(--night);
+  border-radius: 999px;
+  background: var(--gold);
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.map-frame iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  border: 0;
+}
+
 .facility-card h3,
 .path-card h3,
 .contact-card h3 {
@@ -1400,6 +1827,8 @@ h3 {
   .split-section,
   .contact-section,
   .faq-teaser,
+  .blueprint-teaser,
+  .blueprint-gate,
   .media-showcase,
   .mega-menu {
     grid-template-columns: 1fr;
@@ -1417,6 +1846,12 @@ h3 {
   }
 
   .feature-showcase {
+    grid-template-columns: 1fr;
+  }
+
+  .blueprint-fields,
+  .choice-grid,
+  .report-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1590,6 +2025,20 @@ h3 {
     grid-template-columns: 1fr;
   }
 
+  .contact-section .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .location-switch button,
+  .location-actions a {
+    flex: 1 1 160px;
+  }
+
+  .map-frame,
+  .map-frame iframe {
+    min-height: 320px;
+  }
+
   .footer-bottom {
     flex-direction: column;
   }
@@ -1600,6 +2049,12 @@ h3 {
     min-height: 44px;
     padding: 10px 14px;
     font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 1180px) and (min-width: 1051px) {
+  .desktop-nav {
+    display: none;
   }
 }
 
@@ -1663,7 +2118,13 @@ h3 {
   .news-card div,
   .contact-card,
   .metric,
-  .enquiry-form {
+  .enquiry-form,
+  .blueprint-step,
+  .blueprint-gate,
+  .report-hero-card,
+  .report-grid article,
+  .score-panel,
+  .match-card {
     padding: 18px;
   }
 
