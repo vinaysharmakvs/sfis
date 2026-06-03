@@ -16,8 +16,78 @@ const locationDirections = document.querySelector("[data-location-directions]");
 const whatsappNumber = "918826758881";
 const landingPopupSeenKey = "sfisLandingPopupSeen";
 const savedBlueprintKey = "sfisFutureSparkReport";
-const visitorCountKey = "sfisVisitorCount";
-const visitorSessionKey = "sfisVisitorCounted";
+
+const parentBotQuickQuestions = [
+  "When will admissions open?",
+  "Which classes are available?",
+  "What is Kidsverse priority?",
+  "Where is the enquiry office?",
+  "What facilities are planned?",
+  "What is Future Spark AI Report?",
+];
+
+const parentBotAnswers = [
+  {
+    keywords: ["admission", "admissions", "open", "start", "date", "december", "session", "apply"],
+    answer:
+      "Admissions are planned to open in December 2026 for the academic session commencing thereafter. Parents can register interest early because initial seats will be limited.",
+  },
+  {
+    keywords: ["class", "grade", "nursery", "ukg", "lkg", "5", "fifth", "classes"],
+    answer:
+      "SFIS is planned to begin gradually up to Grade 5. This helps the school build quality, systems, teachers, and culture step by step.",
+  },
+  {
+    keywords: ["kidsverse", "priority", "reservation", "reserved", "50", "preference"],
+    answer:
+      "Eligible Kidsverse students will receive admission priority, with 50% of available seats reserved as a gratitude gesture to families who trusted the founders from the beginning.",
+  },
+  {
+    keywords: ["seat", "limited", "availability", "quantity", "batch", "super 30"],
+    answer:
+      "Seats will be limited because SFIS is focused on quality over quantity. The goal is smaller, high-engagement learning groups where children receive individual attention.",
+  },
+  {
+    keywords: ["test", "assessment", "screening", "syllabus", "exam"],
+    answer:
+      "New applicants will have an admission screening assessment. Detailed guidelines and curriculum will be released in December 2026 before admissions begin.",
+  },
+  {
+    keywords: ["office", "enquiry", "address", "kidsverse school", "rehan", "construction"],
+    answer:
+      "The temporary enquiry office is Kidsverse School, Rehan, until SFIS construction is complete. Parents can visit there for guidance, priority list registration, and next steps.",
+  },
+  {
+    keywords: ["location", "campus", "where", "shani", "mandir", "kukhnaira", "map"],
+    answer:
+      "The SFIS campus site is in Kukhnaira, 200 meters from Shani Dev Mandir. The contact page has an interactive map for both the enquiry office and campus site.",
+  },
+  {
+    keywords: ["facility", "facilities", "lab", "robotics", "computer", "sports", "basketball", "badminton", "cricket", "yoga", "splash", "theater", "garden"],
+    answer:
+      "SFIS is planned with a high-tech computer lab, robotics lab, basketball ground, badminton court, cricket net facility, yoga retreat center, splash zone, open-air theater, and beautiful gardens.",
+  },
+  {
+    keywords: ["future spark", "ai report", "report", "child report", "strength", "learning style", "child shine"],
+    answer:
+      "Future Spark AI Report is a parent-friendly interactive experience for children aged 5 to 10. It gives a colorful strength report with learning signals, confidence patterns, growth guidance, and SFIS support areas.",
+  },
+  {
+    keywords: ["founder", "founders", "neha", "vinay", "behind", "managed"],
+    answer:
+      "Stone Field International School is founded by Neha Sharma and Vinay Sharma, the same team behind Kidsverse Playschool Rehan and the After School Activity Center Rehan.",
+  },
+  {
+    keywords: ["app", "diary", "parent update", "communication", "homework", "attendance"],
+    answer:
+      "SFIS plans a digital parent communication system for updates such as daily learning, homework, attendance, announcements, events, and parent-school communication.",
+  },
+  {
+    keywords: ["fees", "fee", "transport", "documents", "uniform", "book", "callback", "call"],
+    answer:
+      "For personal details such as fees, transport, documents, or a callback, please message the enquiry team on WhatsApp at +91 88267 58881.",
+  },
+];
 
 const locationMapData = {
   office: {
@@ -61,24 +131,100 @@ whatsappFloat.setAttribute("aria-label", "Send WhatsApp inquiry");
 whatsappFloat.textContent = "WhatsApp";
 document.body.appendChild(whatsappFloat);
 
-function renderVisitorCounter() {
-  const footerBottom = document.querySelector(".footer-bottom");
-  if (!footerBottom) return;
+function createParentChatbot() {
+  const bot = document.createElement("div");
+  bot.className = "parent-chatbot";
+  bot.innerHTML = `
+    <button class="parent-chatbot-toggle" type="button" aria-expanded="false">
+      <span class="parent-chatbot-icon" aria-hidden="true">AI</span>
+      <span class="parent-chatbot-copy"><small>Ask SFIS AI</small><strong>Parent Admission Guide</strong></span>
+      <span class="parent-chatbot-ping" aria-hidden="true"></span>
+    </button>
+    <button class="parent-chatbot-nudge" type="button">Have questions? Ask about admissions, fees, classes, or Kidsverse priority.</button>
+    <section class="parent-chatbot-panel" hidden aria-label="SFIS parent assistant">
+      <div class="parent-chatbot-head">
+        <div><span>SFIS AI Assistant</span><strong>Parent Q&A Desk</strong></div>
+        <button type="button" aria-label="Close parent assistant">X</button>
+      </div>
+      <div class="parent-chatbot-messages" aria-live="polite"></div>
+      <div class="parent-chatbot-quick" aria-label="Quick questions"></div>
+      <form class="parent-chatbot-form">
+        <input type="text" placeholder="Ask about admissions, classes, facilities..." aria-label="Ask SFIS a question" />
+        <button type="submit">Ask</button>
+      </form>
+      <a class="parent-chatbot-whatsapp" href="https://wa.me/${whatsappNumber}?text=Hello%20Stone%20Field%20International%20School%2C%20I%20need%20help%20with%20admissions" target="_blank" rel="noopener noreferrer">Talk to enquiry team on WhatsApp</a>
+    </section>
+  `;
+  document.body.appendChild(bot);
 
-  let count = Number(localStorage.getItem(visitorCountKey) || "0");
-  if (!sessionStorage.getItem(visitorSessionKey)) {
-    count += 1;
-    localStorage.setItem(visitorCountKey, String(count));
-    sessionStorage.setItem(visitorSessionKey, "true");
+  const toggle = bot.querySelector(".parent-chatbot-toggle");
+  const nudge = bot.querySelector(".parent-chatbot-nudge");
+  const panel = bot.querySelector(".parent-chatbot-panel");
+  const closeButton = bot.querySelector(".parent-chatbot-head button");
+  const messages = bot.querySelector(".parent-chatbot-messages");
+  const quick = bot.querySelector(".parent-chatbot-quick");
+  const form = bot.querySelector(".parent-chatbot-form");
+  const input = bot.querySelector(".parent-chatbot-form input");
+
+  function addMessage(text, type = "bot") {
+    const message = document.createElement("div");
+    message.className = `parent-chatbot-message is-${type}`;
+    message.textContent = text;
+    messages.appendChild(message);
+    messages.scrollTop = messages.scrollHeight;
   }
 
-  const counter = document.createElement("span");
-  counter.className = "visitor-counter";
-  counter.innerHTML = `<b>${count.toLocaleString("en-IN")}</b> <small>Visitor Count</small>`;
-  footerBottom.appendChild(counter);
+  function answerQuestion(question) {
+    const cleanQuestion = question.trim();
+    if (!cleanQuestion) return;
+    addMessage(cleanQuestion, "user");
+    const query = cleanQuestion.toLowerCase();
+    const ranked = parentBotAnswers
+      .map((item) => ({
+        item,
+        score: item.keywords.reduce((score, keyword) => score + (query.includes(keyword) ? 1 : 0), 0),
+      }))
+      .sort((a, b) => b.score - a.score);
+    const best = ranked[0];
+    addMessage(
+      best?.score
+        ? best.item.answer
+        : "I can help with admissions, classes up to Grade 5, Kidsverse priority, facilities, location, Future Spark AI Report, and enquiry office details. For a personal discussion, please use WhatsApp.",
+      "bot"
+    );
+  }
+
+  function setBotOpen(open) {
+    panel.hidden = !open;
+    toggle.setAttribute("aria-expanded", String(open));
+    bot.classList.toggle("is-open", open);
+    if (open) input.focus({ preventScroll: true });
+  }
+
+  addMessage("Namaste. I can answer common parent questions about SFIS admissions, facilities, location, Kidsverse priority, and the Future Spark AI Report.");
+
+  parentBotQuickQuestions.forEach((question) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = question;
+    button.addEventListener("click", () => answerQuestion(question));
+    quick.appendChild(button);
+  });
+
+  toggle.addEventListener("click", () => setBotOpen(panel.hidden));
+  nudge.addEventListener("click", () => setBotOpen(true));
+  closeButton.addEventListener("click", () => setBotOpen(false));
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    answerQuestion(input.value);
+    input.value = "";
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setBotOpen(false);
+  });
 }
 
-renderVisitorCounter();
+createParentChatbot();
 
 document.querySelectorAll("img[data-fallback]").forEach((image) => {
   image.addEventListener(
