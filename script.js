@@ -4,6 +4,16 @@ const enquiryForm = document.querySelector(".enquiry-form");
 const landingPopup = document.querySelector(".landing-popup");
 const landingPopupClose = document.querySelector(".landing-popup-close");
 const whatsappNumber = "918826758881";
+const landingPopupSeenKey = "sfisLandingPopupSeen";
+
+if (landingPopup && localStorage.getItem(landingPopupSeenKey) !== "true") {
+  landingPopup.classList.add("is-open");
+}
+
+function closeLandingPopup() {
+  landingPopup?.classList.remove("is-open");
+  localStorage.setItem(landingPopupSeenKey, "true");
+}
 
 const whatsappFloat = document.createElement("a");
 whatsappFloat.className = "whatsapp-float";
@@ -42,15 +52,15 @@ megaMenu?.addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") setMenu(false);
-  if (event.key === "Escape") landingPopup?.classList.remove("is-open");
+  if (event.key === "Escape" && landingPopup?.classList.contains("is-open")) closeLandingPopup();
 });
 
 landingPopupClose?.addEventListener("click", () => {
-  landingPopup?.classList.remove("is-open");
+  closeLandingPopup();
 });
 
 landingPopup?.addEventListener("click", (event) => {
-  if (event.target === landingPopup) landingPopup.classList.remove("is-open");
+  if (event.target === landingPopup) closeLandingPopup();
 });
 
 enquiryForm?.addEventListener("submit", (event) => {
