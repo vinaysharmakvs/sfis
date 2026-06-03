@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Future Spark AI Report | Stone Field International School</title>
+    <meta name="description" content="Discover your child's strengths, learning personality, and growth signals with the Future Spark AI Report experience." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html"><span class="brand-mark">SFIS</span><span><strong>Stone Field</strong><small>International School</small></span></a>
+      <nav class="desktop-nav"><a href="index.html">Home</a><a href="about.html">About</a><a href="academics.html">Academics</a><a href="facilities.html">Facilities</a><a href="admissions.html">Admissions</a><a class="is-active" href="child-blueprint.html">AI Report</a><a href="faq.html">FAQ</a><a href="contact.html">Contact</a></nav>
+      <div class="header-actions"><a class="chip-link" href="#blueprintTool">Start Test</a><button class="menu-button" type="button" aria-expanded="false" aria-controls="megaMenu" aria-label="Open menu"><span></span><span></span><span></span></button></div>
+    </header>
+    <aside class="mega-menu" id="megaMenu" aria-hidden="true">
+      <nav class="mega-links"><a href="about.html">About <span>01</span></a><a href="academics.html">Academics <span>02</span></a><a href="facilities.html">Facilities <span>03</span></a><a href="admissions.html">Admissions <span>04</span></a><a href="child-blueprint.html">AI Report <span>05</span></a><a href="faq.html">FAQ <span>06</span></a><a href="contact.html">Contact <span>07</span></a></nav>
+      <div class="mega-panel"><p class="eyebrow">Future Spark AI Report</p><h2>Discover strengths and growth signals.</h2><p>A parent-friendly AI-inspired reflection tool for children aged 5 to 10 years.</p><a class="primary-button" href="#blueprintTool">Start</a></div>
+    </aside>
+
+    <main>
+      <section class="page-hero blueprint-hero">
+        <div class="page-intro">
+          <p class="eyebrow">Future Spark AI Report</p>
+          <h1>Discover your child’s hidden strengths.</h1>
+          <p class="lead">Explore learning personality, emotional tendencies, confidence patterns, and gentle growth guidance through a playful AI-inspired experience.</p>
+        </div>
+      </section>
+
+      <section class="section blueprint-tool" id="blueprintTool">
+        <form class="blueprint-form" novalidate>
+          <div class="blueprint-step">
+            <p class="eyebrow">Step 1</p>
+            <h2>Child Profile</h2>
+            <div class="blueprint-fields">
+              <label>Child name<input name="childName" type="text" required /></label>
+              <label>Age<select name="age" required><option value="">Select</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+              <label>Gender<select name="gender" required><option value="">Select</option><option>Girl</option><option>Boy</option><option>Prefer not to say</option></select></label>
+              <label>Favourite subject<input name="subject" type="text" placeholder="Science, English, Maths..." required /></label>
+              <label>Favourite activity<input name="activity" type="text" placeholder="Drawing, cricket, music..." required /></label>
+              <label>Birth month<select name="birthMonth" required><option value="">Select</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></label>
+              <label>Birth order<select name="birthOrder" required><option value="">Select</option><option>Only Child</option><option>Elder Sibling</option><option>Younger Sibling</option></select></label>
+            </div>
+          </div>
+
+          <div class="blueprint-step">
+            <p class="eyebrow">Step 2</p>
+            <h2>AI Behaviour Analysis</h2>
+            <div class="choice-grid">
+              <fieldset><legend>When corrected, your child...</legend><label><input type="radio" name="correction" value="accepts" required />Accepts quickly</label><label><input type="radio" name="correction" value="upset" />Gets upset</label><label><input type="radio" name="correction" value="argues" />Argues</label><label><input type="radio" name="correction" value="quiet" />Becomes quiet</label></fieldset>
+              <fieldset><legend>When meeting new people...</legend><label><input type="radio" name="confidence" value="talks" required />Starts talking immediately</label><label><input type="radio" name="confidence" value="observes" />Waits to observe</label><label><input type="radio" name="confidence" value="hides" />Hides behind parents</label><label><input type="radio" name="confidence" value="encourage" />Needs encouragement</label></fieldset>
+              <fieldset><legend>During group activities...</legend><label><input type="radio" name="leadership" value="charge" required />Takes charge</label><label><input type="radio" name="leadership" value="supports" />Supports others</label><label><input type="radio" name="leadership" value="observes" />Observes</label><label><input type="radio" name="leadership" value="alone" />Prefers working alone</label></fieldset>
+              <fieldset><legend>If given a cardboard box...</legend><label><input type="radio" name="creativity" value="makes" required />Makes something new</label><label><input type="radio" name="creativity" value="normal" />Uses it normally</label><label><input type="radio" name="creativity" value="ignores" />Ignores it</label><label><input type="radio" name="creativity" value="asks" />Asks what to do</label></fieldset>
+              <fieldset><legend>When a puzzle is difficult...</legend><label><input type="radio" name="problemSolving" value="tries" required />Keeps trying different ways</label><label><input type="radio" name="problemSolving" value="help" />Asks for help quickly</label><label><input type="radio" name="problemSolving" value="pause" />Takes a break and returns</label><label><input type="radio" name="problemSolving" value="frustrated" />Gets frustrated</label></fieldset>
+              <fieldset><legend>During homework or tasks...</legend><label><input type="radio" name="focus" value="finishes" required />Finishes with focus</label><label><input type="radio" name="focus" value="reminders" />Needs reminders</label><label><input type="radio" name="focus" value="creative" />Adds creative ideas</label><label><input type="radio" name="focus" value="rushes" />Rushes to finish</label></fieldset>
+              <fieldset><legend>When another child is upset...</legend><label><input type="radio" name="empathy" value="comforts" required />Tries to comfort them</label><label><input type="radio" name="empathy" value="asks" />Asks what happened</label><label><input type="radio" name="empathy" value="watches" />Watches quietly</label><label><input type="radio" name="empathy" value="moves" />Moves away</label></fieldset>
+              <fieldset><legend>When learning something new...</legend><label><input type="radio" name="learning" value="curious" required />Asks many questions</label><label><input type="radio" name="learning" value="practice" />Learns by practice</label><label><input type="radio" name="learning" value="visual" />Learns by seeing examples</label><label><input type="radio" name="learning" value="story" />Learns through stories</label></fieldset>
+            </div>
+          </div>
+
+          <button class="primary-button" type="submit">Generate Assessment Report</button>
+          <p class="blueprint-error" role="alert" hidden></p>
+          <p class="blueprint-note">This is a parent reflection experience based on selected responses. It is not a medical, psychological, or career assessment.</p>
+        </form>
+
+        <section class="blueprint-gate" hidden>
+          <div>
+            <p class="eyebrow">Priority Admission List</p>
+            <h2>Send us your report on WhatsApp.</h2>
+            <p>Join the priority interest list for next year’s admissions and receive early updates from our enquiry team.</p>
+          </div>
+          <form class="blueprint-lead-form">
+            <label>Parent name<input name="parentName" type="text" required /></label>
+            <label>Mobile number<input name="mobile" type="tel" required /></label>
+            <label>Email<input name="email" type="email" required /></label>
+            <button class="primary-button" type="submit">Join Priority List on WhatsApp</button>
+          </form>
+        </section>
+
+        <section class="blueprint-report" hidden>
+          <div class="report-hero-card">
+            <p class="eyebrow">AI Archetype</p>
+            <h2 data-report="archetype">The Future Leader</h2>
+            <p data-report="summary">Natural authority, competitive spirit, and strong decision-making.</p>
+            <div class="archetype-score">
+              <span>Strength Pattern Match</span>
+              <strong data-report="archetypeScore">--</strong>
+            </div>
+          </div>
+          <div class="report-grid">
+            <article><h3>Questionnaire Summary</h3><ul data-report="answers"></ul></article>
+            <article><h3>Hidden Superpowers</h3><ul data-report="superpowers"></ul></article>
+            <article><h3>Potential Challenges</h3><ul data-report="challenges"></ul></article>
+            <article><h3>Suggested Parent Nudges</h3><ul data-report="actionPlan"></ul></article>
+            <article><h3>Observed Growth Signals</h3><ul data-report="benchmark"></ul></article>
+          </div>
+          <div class="score-panel">
+            <h3>Growth Signal Snapshot</h3>
+            <p class="blueprint-note">These indicators are gentle tendencies from today’s answers, not fixed labels. Children grow beautifully with time, support, and the right environment.</p>
+            <div class="score-bars" data-report="scores"></div>
+          </div>
+          <div class="match-card">
+            <p class="eyebrow">SFIS Support Readiness</p>
+            <strong data-report="match">--</strong>
+            <p>This score is calculated from the child’s response-based growth signals and how many of those signals connect with SFIS support areas such as projects, communication, sports, technology, mentoring, and wellbeing. It is not an admission decision or a fixed judgement of the child.</p>
+            <h3>How this score was estimated</h3>
+            <ul data-report="fitFactors"></ul>
+            <h3>How SFIS can assist your child’s progress</h3>
+            <ul data-report="sfisAssist"></ul>
+            <div class="report-actions">
+              <button class="primary-button print-blueprint" type="button">Download PDF</button>
+              <a class="secondary-button" href="contact.html">Connect With Enquiry Team</a>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="footer-bottom"><span>Stone Field International School</span><span>AI-inspired guidance for curious parents.</span></div></footer>
+    <script src="script.js"></script>
+  </body>
+</html>
