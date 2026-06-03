@@ -1,6 +1,8 @@
 const menuButton = document.querySelector(".menu-button");
 const megaMenu = document.querySelector(".mega-menu");
 const enquiryForm = document.querySelector(".enquiry-form");
+const landingPopup = document.querySelector(".landing-popup");
+const landingPopupClose = document.querySelector(".landing-popup-close");
 const whatsappNumber = "918826758881";
 
 const whatsappFloat = document.createElement("a");
@@ -40,6 +42,15 @@ megaMenu?.addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") setMenu(false);
+  if (event.key === "Escape") landingPopup?.classList.remove("is-open");
+});
+
+landingPopupClose?.addEventListener("click", () => {
+  landingPopup?.classList.remove("is-open");
+});
+
+landingPopup?.addEventListener("click", (event) => {
+  if (event.target === landingPopup) landingPopup.classList.remove("is-open");
 });
 
 enquiryForm?.addEventListener("submit", (event) => {
