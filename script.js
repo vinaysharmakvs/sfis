@@ -137,10 +137,10 @@ function createParentChatbot() {
   bot.innerHTML = `
     <button class="parent-chatbot-toggle" type="button" aria-expanded="false">
       <span class="parent-chatbot-icon" aria-hidden="true">AI</span>
-      <span class="parent-chatbot-copy"><small>Ask SFIS AI</small><strong>Parent Admission Guide</strong></span>
+      <span class="parent-chatbot-copy"><strong>SFIS AI</strong></span>
       <span class="parent-chatbot-ping" aria-hidden="true"></span>
     </button>
-    <button class="parent-chatbot-nudge" type="button">Have questions? Ask about admissions, fees, classes, or Kidsverse priority.</button>
+    <button class="parent-chatbot-dismiss" type="button" aria-label="Hide SFIS AI chat">X</button>
     <section class="parent-chatbot-panel" hidden aria-label="SFIS parent assistant">
       <div class="parent-chatbot-head">
         <div><span>SFIS AI Assistant</span><strong>Parent Q&A Desk</strong></div>
@@ -158,7 +158,7 @@ function createParentChatbot() {
   document.body.appendChild(bot);
 
   const toggle = bot.querySelector(".parent-chatbot-toggle");
-  const nudge = bot.querySelector(".parent-chatbot-nudge");
+  const dismiss = bot.querySelector(".parent-chatbot-dismiss");
   const panel = bot.querySelector(".parent-chatbot-panel");
   const closeButton = bot.querySelector(".parent-chatbot-head button");
   const messages = bot.querySelector(".parent-chatbot-messages");
@@ -212,7 +212,9 @@ function createParentChatbot() {
   });
 
   toggle.addEventListener("click", () => setBotOpen(panel.hidden));
-  nudge.addEventListener("click", () => setBotOpen(true));
+  dismiss.addEventListener("click", () => {
+    setBotOpen(false);
+  });
   closeButton.addEventListener("click", () => setBotOpen(false));
   form.addEventListener("submit", (event) => {
     event.preventDefault();
