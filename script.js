@@ -16,6 +16,8 @@ const locationDirections = document.querySelector("[data-location-directions]");
 const whatsappNumber = "918826758881";
 const landingPopupSeenKey = "sfisLandingPopupSeen";
 const savedBlueprintKey = "sfisFutureSparkReport";
+const visitorCountKey = "sfisVisitorCount";
+const visitorSessionKey = "sfisVisitorCounted";
 
 const locationMapData = {
   office: {
@@ -58,6 +60,25 @@ whatsappFloat.rel = "noopener noreferrer";
 whatsappFloat.setAttribute("aria-label", "Send WhatsApp inquiry");
 whatsappFloat.textContent = "WhatsApp";
 document.body.appendChild(whatsappFloat);
+
+function renderVisitorCounter() {
+  const footerBottom = document.querySelector(".footer-bottom");
+  if (!footerBottom) return;
+
+  let count = Number(localStorage.getItem(visitorCountKey) || "0");
+  if (!sessionStorage.getItem(visitorSessionKey)) {
+    count += 1;
+    localStorage.setItem(visitorCountKey, String(count));
+    sessionStorage.setItem(visitorSessionKey, "true");
+  }
+
+  const counter = document.createElement("span");
+  counter.className = "visitor-counter";
+  counter.innerHTML = `<b>${count.toLocaleString("en-IN")}</b> <small>Visitor Count</small>`;
+  footerBottom.appendChild(counter);
+}
+
+renderVisitorCounter();
 
 document.querySelectorAll("img[data-fallback]").forEach((image) => {
   image.addEventListener(
