@@ -583,6 +583,249 @@ textarea {
     url("assets/circuit-campus.png") center / cover;
 }
 
+.blog-hero {
+  background:
+    linear-gradient(135deg, rgba(7, 17, 15, 0.84), rgba(14, 36, 33, 0.9)),
+    url("assets/gardens.png") center / cover;
+}
+
+.blog-byline {
+  margin-top: 18px;
+  color: var(--gold);
+  font-weight: 850;
+}
+
+.blog-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.38fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: start;
+  background: #fbfff8;
+}
+
+.blog-article {
+  max-width: 820px;
+}
+
+.blog-article p,
+.blog-article li {
+  color: rgba(19, 32, 29, 0.72);
+  font-size: 1.03rem;
+  line-height: 1.85;
+}
+
+.blog-article h2 {
+  margin-top: 34px;
+  color: var(--night);
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+}
+
+.blog-article blockquote {
+  margin: 32px 0;
+  padding: 24px;
+  color: var(--night);
+  border-left: 5px solid var(--gold);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(240, 189, 79, 0.18), rgba(42, 219, 180, 0.12));
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.blog-article ul {
+  display: grid;
+  gap: 8px;
+  padding-left: 22px;
+}
+
+.blog-callout,
+.blog-note-card,
+.founder-card {
+  border: 1px solid rgba(26, 88, 72, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 22px 64px rgba(7, 17, 15, 0.12);
+}
+
+.blog-callout {
+  margin: 34px 0;
+  padding: 24px;
+  background: #07110f;
+}
+
+.blog-callout strong {
+  display: block;
+  color: var(--gold);
+  font-size: 1.2rem;
+}
+
+.blog-callout p {
+  margin-bottom: 0;
+  color: var(--soft);
+}
+
+.blog-sidebar {
+  position: sticky;
+  top: 104px;
+  display: grid;
+  gap: 18px;
+}
+
+.founder-card,
+.blog-note-card {
+  padding: clamp(22px, 3vw, 32px);
+  background: #ffffff;
+}
+
+.founder-card h2 {
+  color: var(--night);
+}
+
+.founder-card p,
+.founder-card span,
+.blog-note-card p {
+  color: rgba(19, 32, 29, 0.68);
+  line-height: 1.7;
+}
+
+.founder-card span {
+  display: block;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(26, 88, 72, 0.12);
+  font-weight: 800;
+}
+
+.founder-portrait-mark {
+  width: 100%;
+  aspect-ratio: 0.72;
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(26, 88, 72, 0.18);
+  border-radius: 8px;
+  background: var(--night);
+}
+
+.founder-portrait-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.blog-note-card strong {
+  color: var(--night);
+  font-size: 1.12rem;
+}
+
+.blog-next {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+}
+
+.founder-blog-teaser {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(300px, 0.55fr);
+  gap: clamp(24px, 5vw, 56px);
+  align-items: center;
+}
+
+.founder-blog-teaser p {
+  color: rgba(19, 32, 29, 0.68);
+  line-height: 1.7;
+}
+
+.founder-blog-final {
+  overflow: hidden;
+  color: var(--dark-text);
+  background:
+    radial-gradient(circle at 88% 18%, rgba(240, 189, 79, 0.18), transparent 28%),
+    linear-gradient(135deg, #f8fbf4 0%, #eef7ef 55%, #fff5dd 100%);
+}
+
+.founder-blog-copy {
+  max-width: 760px;
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid rgba(26, 88, 72, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 20px 64px rgba(7, 17, 15, 0.08);
+}
+
+.founder-blog-copy .eyebrow {
+  color: #0b6b55;
+}
+
+.founder-blog-copy h2 {
+  color: var(--dark-text);
+  text-shadow: none;
+}
+
+.founder-blog-copy > p {
+  color: rgba(19, 32, 29, 0.78);
+  font-weight: 750;
+}
+
+.founder-blog-tags span {
+  color: #12332d;
+}
+
+.founder-blog-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(110px, 0.34fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+  min-height: 260px;
+  padding: 14px;
+  color: var(--ink);
+  border: 1px solid rgba(26, 88, 72, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 24px 70px rgba(7, 17, 15, 0.14);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.founder-blog-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(42, 219, 180, 0.48);
+  box-shadow: 0 34px 90px rgba(7, 17, 15, 0.2);
+}
+
+.founder-blog-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 232px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.founder-blog-card div {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 12px 6px;
+}
+
+.founder-blog-card span,
+.founder-blog-card small {
+  color: rgba(19, 32, 29, 0.62);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.founder-blog-card strong {
+  color: var(--night);
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  line-height: 1.2;
+}
+
+.founder-blog-card small {
+  color: var(--teal);
+}
+
 .blueprint-tool {
   background:
     radial-gradient(circle at 85% 10%, rgba(42, 219, 180, 0.15), transparent 30%),
@@ -2349,6 +2592,9 @@ h3 {
   .faq-teaser,
   .blueprint-teaser,
   .challenge-teaser,
+  .founder-blog-teaser,
+  .blog-layout,
+  .blog-next,
   .blueprint-gate,
   .media-showcase,
   .mega-menu {
@@ -2384,6 +2630,10 @@ h3 {
 
   .founder-note {
     grid-template-columns: 1fr;
+  }
+
+  .blog-sidebar {
+    position: static;
   }
 
   .five-d-layout {
@@ -2422,6 +2672,44 @@ h3 {
 
   .chip-link {
     display: none;
+  }
+
+  .founder-card {
+    display: grid;
+    grid-template-columns: 94px minmax(0, 1fr);
+    column-gap: 16px;
+    align-items: center;
+  }
+
+  .founder-portrait-mark {
+    grid-row: span 4;
+    width: 94px;
+    height: 118px;
+    margin-bottom: 0;
+    aspect-ratio: auto;
+  }
+
+  .founder-card span {
+    grid-column: 1 / -1;
+    margin-top: 14px;
+  }
+
+  .founder-blog-card {
+    grid-template-columns: 96px minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .founder-blog-card img {
+    min-height: 128px;
+  }
+
+  .founder-blog-card strong {
+    font-size: 1.1rem;
+  }
+
+  .founder-blog-copy h2 {
+    font-size: clamp(2rem, 10vw, 3rem);
+    line-height: 1.02;
   }
 
   .hero {
