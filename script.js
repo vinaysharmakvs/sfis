@@ -1186,12 +1186,11 @@ async function createCertificateImageBlob() {
   <rect x="80" y="80" width="1440" height="960" rx="36" fill="none" stroke="#2adbb4" stroke-width="8"/>
   <rect x="122" y="122" width="1356" height="876" fill="none" stroke="#f0bd4f" stroke-width="4"/>
   <text x="800" y="195" text-anchor="middle" fill="#07110f" font-family="Arial, sans-serif" font-size="40" font-weight="900">Stone Field International School</text>
-  <text x="800" y="234" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="21" font-weight="700">Future Explorer Challenge 2026</text>
+  <text x="800" y="226" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="20" font-weight="700">Future Explorer Challenge 2026</text>
   <circle cx="800" cy="345" r="88" fill="#07110f"/>
   <text x="800" y="363" text-anchor="middle" fill="#f0bd4f" font-family="Arial, sans-serif" font-size="42" font-weight="900">SFIS</text>
   <image href="${xml(sealUrl)}" x="712" y="257" width="176" height="176" preserveAspectRatio="xMidYMid slice" clip-path="url(#sealClip)"/>
   <circle cx="800" cy="345" r="98" fill="none" stroke="#f0bd4f" stroke-width="10"/>
-  <circle cx="800" cy="345" r="111" fill="none" stroke="#2adbb4" stroke-width="4"/>
   <text x="800" y="510" text-anchor="middle" fill="#f0bd4f" font-family="Arial, sans-serif" font-size="58" font-weight="900">Future Explorer Award</text>
   <text x="800" y="565" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="25" font-weight="700">Presented to</text>
   <text x="800" y="${nameStartY}" text-anchor="middle" fill="#07110f" font-family="Arial, sans-serif" font-size="${nameFontSize}" font-weight="900">${nameText}</text>
@@ -1199,8 +1198,8 @@ async function createCertificateImageBlob() {
   <text x="800" y="832" text-anchor="middle" fill="#12332d" font-family="Arial, sans-serif" font-size="30" font-weight="900">Stone Field International School Future Explorer Challenge</text>
   <rect x="560" y="884" width="480" height="66" rx="33" fill="#07110f"/>
   <text x="800" y="927" text-anchor="middle" fill="#2adbb4" font-family="Arial, sans-serif" font-size="27" font-weight="900">${xml(award)} | Score ${xml(score)}%</text>
-  <text x="360" y="1000" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="20" font-weight="700">Young Genius Award 2026</text>
-  <text x="1240" y="1000" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="20" font-weight="700">Official SFIS Seal</text>
+  <text x="360" y="976" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="18" font-weight="700">Young Genius Award 2026</text>
+  <text x="1240" y="976" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="18" font-weight="700">Official SFIS Seal</text>
 </svg>`;
   return new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
 }
