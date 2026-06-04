@@ -342,12 +342,12 @@ function saveLatestBlueprint() {
   }
 }
 
-function submitBlueprintToGoogleForm(data) {
+function submitLeadToGoogleForm(lead) {
   const payload = new URLSearchParams();
-  payload.set("entry.1434087836", String(data.get("fatherName") || "").trim());
-  payload.set("entry.533861399", String(data.get("childName") || "").trim());
-  payload.set("entry.2056952779", String(data.get("fatherMobile") || "").trim());
-  payload.set("entry.1366045606", String(data.get("parentEmail") || "").trim());
+  payload.set("entry.1434087836", String(lead.fatherName || "").trim());
+  payload.set("entry.533861399", String(lead.childName || "").trim());
+  payload.set("entry.2056952779", String(lead.mobile || "").trim());
+  payload.set("entry.1366045606", String(lead.email || "").trim());
 
   if (window.location.protocol === "file:") {
     localStorage.setItem(pendingBlueprintLeadKey, payload.toString());
@@ -361,6 +361,24 @@ function submitBlueprintToGoogleForm(data) {
     body: payload,
   }).catch((error) => {
     console.warn("Google Form submission could not be completed.", error);
+  });
+}
+
+function submitBlueprintToGoogleForm(data) {
+  submitLeadToGoogleForm({
+    fatherName: data.get("fatherName"),
+    childName: data.get("childName"),
+    mobile: data.get("fatherMobile"),
+    email: data.get("parentEmail"),
+  });
+}
+
+function submitChallengeToGoogleForm(data) {
+  submitLeadToGoogleForm({
+    fatherName: data.get("challengeFatherName"),
+    childName: data.get("challengeChild"),
+    mobile: data.get("challengeFatherMobile"),
+    email: data.get("challengeFatherEmail"),
   });
 }
 
@@ -716,10 +734,294 @@ function renderSavedSparkPreview() {
 renderSavedSparkPreview();
 
 let latestChallenge = null;
+let selectedChallengeQuestions = [];
+
+const challengeQuestionBank = [
+  {
+    round: 1,
+    field: "iq",
+    title: "IQ Questions",
+    questions: [
+      {
+        prompt: "Which one does not belong with the others?",
+        options: [["Apple", 0], ["Mango", 0], ["Chair", 20], ["Banana", 0]],
+      },
+      {
+        prompt: "What comes next: 2, 4, 6, 8, __?",
+        options: [["9", 0], ["10", 20], ["11", 0], ["12", 0]],
+      },
+      {
+        prompt: "Which shape has three sides?",
+        options: [["Circle", 0], ["Triangle", 20], ["Square", 0], ["Rectangle", 0]],
+      },
+      {
+        prompt: "If all bloops are red and this is a bloop, what color is it?",
+        options: [["Blue", 0], ["Green", 0], ["Red", 20], ["Yellow", 0]],
+      },
+      {
+        prompt: "Which word is the opposite of heavy?",
+        options: [["Tall", 0], ["Light", 20], ["Fast", 0], ["Round", 0]],
+      },
+      {
+        prompt: "Which number is the smallest?",
+        options: [["17", 0], ["9", 20], ["21", 0], ["13", 0]],
+      },
+      {
+        prompt: "A clock shows 3 o'clock. Which hand points at 3?",
+        options: [["Minute hand", 0], ["Hour hand", 20], ["Second hand", 0], ["No hand", 0]],
+      },
+      {
+        prompt: "Which pair goes together like pencil and paper?",
+        options: [["Spoon and shoe", 0], ["Brush and paint", 20], ["Cup and tree", 0], ["Ball and book", 0]],
+      },
+      {
+        prompt: "What comes next: A, B, C, D, __?",
+        options: [["E", 20], ["G", 0], ["Z", 0], ["A", 0]],
+      },
+      {
+        prompt: "Which item is used to measure time?",
+        options: [["Ruler", 0], ["Clock", 20], ["Bottle", 0], ["Plate", 0]],
+      },
+    ],
+  },
+  {
+    round: 2,
+    field: "observation",
+    title: "Observation Challenge",
+    questions: [
+      {
+        prompt: "Look carefully: teal, gold, teal, blue. Which color appears twice?",
+        options: [["Teal", 20], ["Gold", 0], ["Blue", 0], ["All colors", 0]],
+      },
+      {
+        prompt: "Spot the odd one: STAR, STAR, START, STAR.",
+        options: [["First", 0], ["Second", 0], ["Third", 20], ["Fourth", 0]],
+      },
+      {
+        prompt: "Which word has double letters: apple, kite, sun, dog?",
+        options: [["Apple", 20], ["Kite", 0], ["Sun", 0], ["Dog", 0]],
+      },
+      {
+        prompt: "Count the circles: OO OOO O. How many circles are there?",
+        options: [["5", 0], ["6", 20], ["7", 0], ["8", 0]],
+      },
+      {
+        prompt: "Which number is repeated: 4, 7, 2, 7, 9?",
+        options: [["4", 0], ["7", 20], ["2", 0], ["9", 0]],
+      },
+      {
+        prompt: "Which word is different: cat, bat, hat, pen?",
+        options: [["Cat", 0], ["Bat", 0], ["Hat", 0], ["Pen", 20]],
+      },
+      {
+        prompt: "Look at the pattern: red, blue, red, blue. What should come next?",
+        options: [["Red", 20], ["Blue", 0], ["Green", 0], ["Gold", 0]],
+      },
+      {
+        prompt: "Which letter is missing: A, B, __, D?",
+        options: [["C", 20], ["E", 0], ["F", 0], ["Z", 0]],
+      },
+      {
+        prompt: "Which item is usually found in a garden?",
+        options: [["Flower", 20], ["Pillow", 0], ["Remote", 0], ["Helmet", 0]],
+      },
+      {
+        prompt: "Which is the only animal word: table, chair, tiger, pencil?",
+        options: [["Table", 0], ["Chair", 0], ["Tiger", 20], ["Pencil", 0]],
+      },
+    ],
+  },
+  {
+    round: 3,
+    field: "math",
+    title: "Fun Math",
+    questions: [
+      {
+        prompt: "If 6 birds sit on a tree and 4 more join them, how many birds are there?",
+        options: [["8", 0], ["10", 20], ["12", 0], ["14", 0]],
+      },
+      {
+        prompt: "What is 5 + 7?",
+        options: [["10", 0], ["11", 0], ["12", 20], ["13", 0]],
+      },
+      {
+        prompt: "Ria has 10 candies and gives 3 to a friend. How many are left?",
+        options: [["6", 0], ["7", 20], ["8", 0], ["9", 0]],
+      },
+      {
+        prompt: "Which number is even?",
+        options: [["5", 0], ["7", 0], ["8", 20], ["9", 0]],
+      },
+      {
+        prompt: "What is double of 4?",
+        options: [["6", 0], ["8", 20], ["10", 0], ["12", 0]],
+      },
+      {
+        prompt: "There are 3 boxes with 2 balls in each. How many balls are there?",
+        options: [["5", 0], ["6", 20], ["7", 0], ["8", 0]],
+      },
+      {
+        prompt: "What comes before 50?",
+        options: [["48", 0], ["49", 20], ["51", 0], ["59", 0]],
+      },
+      {
+        prompt: "A triangle has 3 sides. How many sides do 2 triangles have together?",
+        options: [["5", 0], ["6", 20], ["7", 0], ["8", 0]],
+      },
+      {
+        prompt: "Which is greater: 14 or 41?",
+        options: [["14", 0], ["41", 20], ["Both same", 0], ["None", 0]],
+      },
+      {
+        prompt: "If you count by 5s, what comes after 15?",
+        options: [["16", 0], ["20", 20], ["25", 0], ["30", 0]],
+      },
+    ],
+  },
+  {
+    round: 4,
+    field: "reading",
+    title: "Reading Skills",
+    questions: [
+      {
+        prompt: "Read: Ria planted a seed and watered it every morning. What did Ria plant?",
+        options: [["A seed", 20], ["A book", 0], ["A toy", 0], ["A pencil", 0]],
+      },
+      {
+        prompt: "Read: Aman packed his bag before school. What did Aman pack?",
+        options: [["His lunch", 0], ["His bag", 20], ["His shoes", 0], ["His cap", 0]],
+      },
+      {
+        prompt: "Read: The little robot helped Tara clean the table. Who helped Tara?",
+        options: [["A teacher", 0], ["A robot", 20], ["A bird", 0], ["A friend", 0]],
+      },
+      {
+        prompt: "Read: Neel wore a raincoat because it was raining. Why did Neel wear a raincoat?",
+        options: [["It was sunny", 0], ["It was raining", 20], ["It was night", 0], ["It was hot", 0]],
+      },
+      {
+        prompt: "Read: The class clapped when Meera finished her poem. What did Meera finish?",
+        options: [["A race", 0], ["A poem", 20], ["A puzzle", 0], ["A drawing", 0]],
+      },
+      {
+        prompt: "Read: Kabir shared his crayons with a new student. What did Kabir share?",
+        options: [["Crayons", 20], ["Books", 0], ["Shoes", 0], ["Flowers", 0]],
+      },
+      {
+        prompt: "Read: A soft wind moved the yellow kite higher. What moved the kite?",
+        options: [["A wind", 20], ["A car", 0], ["A drum", 0], ["A clock", 0]],
+      },
+      {
+        prompt: "Read: Sia smiled after solving the puzzle. Why did Sia smile?",
+        options: [["She slept", 0], ["She solved the puzzle", 20], ["She lost a toy", 0], ["She ran away", 0]],
+      },
+      {
+        prompt: "Read: The gardener watered the plants before lunch. Who watered the plants?",
+        options: [["The gardener", 20], ["The cook", 0], ["The driver", 0], ["The doctor", 0]],
+      },
+      {
+        prompt: "Read: The team built a small bridge using blocks. What did the team build?",
+        options: [["A bridge", 20], ["A kite", 0], ["A bus", 0], ["A song", 0]],
+      },
+    ],
+  },
+  {
+    round: 5,
+    field: "creativityChallenge",
+    title: "Creativity Questions",
+    questions: [
+      {
+        prompt: "If you could invent something for your school, what would you choose?",
+        options: [["A helpful learning robot", 20], ["A magic library corner", 18], ["A garden science lab", 18], ["A new sports game", 16]],
+      },
+      {
+        prompt: "A cardboard box is placed in front of you. What would you make?",
+        options: [["A spaceship classroom", 20], ["A reading cave", 18], ["A toy house", 18], ["A storage box", 14]],
+      },
+      {
+        prompt: "If your classroom had a new corner, what should it be?",
+        options: [["Idea lab", 20], ["Art wall", 18], ["Quiet reading spot", 18], ["Bag shelf", 14]],
+      },
+      {
+        prompt: "Which project sounds most exciting?",
+        options: [["Build a tiny city", 20], ["Design a story book", 18], ["Plant a mini garden", 18], ["Copy a worksheet", 12]],
+      },
+      {
+        prompt: "If you found a strange button, what would you do first?",
+        options: [["Ask what it does and test safely", 20], ["Draw it", 18], ["Tell a story about it", 18], ["Ignore it", 12]],
+      },
+      {
+        prompt: "What would you create for a school exhibition?",
+        options: [["A working model", 20], ["A handmade poster", 18], ["A poem corner", 18], ["A plain chart", 14]],
+      },
+      {
+        prompt: "If a friend cannot understand a game, what would you do?",
+        options: [["Create a simple new rule", 20], ["Explain with examples", 18], ["Show by playing", 18], ["Stop playing", 10]],
+      },
+      {
+        prompt: "Which idea feels most imaginative?",
+        options: [["A talking science wall", 20], ["A story garden", 18], ["A kindness mailbox", 18], ["A normal notice board", 12]],
+      },
+      {
+        prompt: "How would you make morning assembly more interesting?",
+        options: [["Add student idea showcases", 20], ["Add music and stories", 18], ["Add quick quiz rounds", 18], ["Keep it exactly same", 10]],
+      },
+      {
+        prompt: "If you could solve one school problem, what would you design?",
+        options: [["A smart lost-and-found system", 20], ["A clean campus club", 18], ["A buddy help desk", 18], ["A bigger bell", 12]],
+      },
+    ],
+  },
+];
+
+function pickChallengeQuestion(questions) {
+  return questions[Math.floor(Math.random() * questions.length)];
+}
+
+function renderChallengeQuestions() {
+  if (!challengeForm) return;
+  selectedChallengeQuestions = challengeQuestionBank.map((round) => ({ ...round, ...pickChallengeQuestion(round.questions) }));
+  selectedChallengeQuestions.forEach((question) => {
+    const fieldset = challengeForm.querySelector(`.challenge-round[data-round="${question.round}"]`);
+    if (!fieldset) return;
+    fieldset.textContent = "";
+
+    const legend = document.createElement("legend");
+    const roundLabel = document.createElement("span");
+    roundLabel.textContent = `Round ${question.round}`;
+    legend.append(roundLabel, ` ${question.title}`);
+
+    const prompt = document.createElement("p");
+    prompt.textContent = question.prompt;
+
+    fieldset.append(legend, prompt);
+    question.options.forEach(([text, score], index) => {
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = question.field;
+      input.value = String(score);
+      input.required = index === 0;
+      label.append(input, text);
+      fieldset.appendChild(label);
+    });
+  });
+}
 
 function updateChallengeProgress() {
   if (!challengeForm || !challengeProgress) return;
-  const fields = ["challengeChild", "challengeAge", "iq", "observation", "math", "reading", "creativityChallenge"];
+  const fields = [
+    "challengeFatherName",
+    "challengeChild",
+    "challengeFatherMobile",
+    "challengeFatherEmail",
+    "challengeAge",
+    "iq",
+    "observation",
+    "math",
+    "reading",
+    "creativityChallenge",
+  ];
   const data = new FormData(challengeForm);
   const completed = fields.filter((field) => String(data.get(field) || "").trim()).length;
   challengeProgress.style.width = `${Math.round(completed / fields.length * 100)}%`;
@@ -763,13 +1065,26 @@ function validateChallenge() {
   clearChallengeErrors();
   const data = new FormData(challengeForm);
   const missing = [];
+  const fatherEmail = String(data.get("challengeFatherEmail") || "").trim();
+  const fatherMobile = String(data.get("challengeFatherMobile") || "").trim();
+  if (!String(data.get("challengeFatherName") || "").trim()) missing.push("father name");
   if (!String(data.get("challengeChild") || "").trim()) missing.push("child name");
+  if (!fatherMobile) missing.push("mobile number");
+  if (!fatherEmail) missing.push("father email");
   if (!String(data.get("challengeAge") || "").trim()) missing.push("age");
   ["iq", "observation", "math", "reading", "creativityChallenge"].forEach((field) => {
     if (!data.get(field)) missing.push(field === "creativityChallenge" ? "creativity round" : `${field} round`);
   });
   if (missing.length) {
     showChallengeError(`Please complete ${missing.join(", ")} before revealing the result.`);
+    return false;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fatherEmail)) {
+    showChallengeError("Please enter a valid father email before revealing the result.");
+    return false;
+  }
+  if (!/^\+?\d[\d\s-]{7,14}\d$/.test(fatherMobile)) {
+    showChallengeError("Please enter a valid mobile number before revealing the result.");
     return false;
   }
   return true;
@@ -813,6 +1128,7 @@ function createCertificatePdf() {
   return new Blob([pdf], { type: "application/pdf" });
 }
 
+renderChallengeQuestions();
 challengeForm?.addEventListener("input", updateChallengeProgress);
 challengeForm?.addEventListener("change", updateChallengeProgress);
 
@@ -823,14 +1139,22 @@ challengeForm?.addEventListener("submit", (event) => {
   const score = ["iq", "observation", "math", "reading", "creativityChallenge"].reduce((total, field) => total + Number(data.get(field) || 0), 0);
   const award = challengeAward(score);
   latestChallenge = {
+    fatherName: String(data.get("challengeFatherName") || "").trim(),
     childName: String(data.get("challengeChild") || "").trim(),
+    mobile: String(data.get("challengeFatherMobile") || "").trim(),
+    email: String(data.get("challengeFatherEmail") || "").trim(),
     age: data.get("challengeAge"),
+    questions: selectedChallengeQuestions.map((question) => question.prompt),
     score,
     award: award.title,
   };
+  submitChallengeToGoogleForm(data);
   challengeResult.querySelector("[data-challenge-result]").textContent = award.title;
   challengeResult.querySelector("[data-challenge-score]").textContent = `${score}%`;
   challengeResult.querySelector("[data-challenge-message]").textContent = award.message;
+  if (certificateForm?.elements.certificateEmail) {
+    certificateForm.elements.certificateEmail.value = latestChallenge.email;
+  }
   challengeResult.hidden = false;
   challengeResult.scrollIntoView({ behavior: "smooth", block: "start" });
 });
