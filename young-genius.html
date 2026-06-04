@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Future Explorer Challenge | Stone Field International School</title>
+    <meta name="description" content="A 5-minute SFIS Future Explorer Challenge for children aged 5 to 10 with instant result and certificate." />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <meta name="theme-color" content="#07110f" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html"><span class="brand-mark">SFIS</span><span><strong>Stone Field</strong><small>International School</small></span></a>
+      <nav class="desktop-nav"><a href="index.html">Home</a><a href="about.html">About</a><a href="academics.html">Academics</a><a href="facilities.html">Facilities</a><a href="admissions.html">Admissions</a><a href="child-blueprint.html">AI Report</a><a class="is-active" href="young-genius.html">Challenge</a><a href="faq.html">FAQ</a><a href="contact.html">Contact</a></nav>
+      <div class="header-actions"><a class="chip-link" href="#futureExplorer">Start Challenge</a><button class="menu-button" type="button" aria-expanded="false" aria-controls="megaMenu" aria-label="Open menu"><span></span><span></span><span></span></button></div>
+    </header>
+    <aside class="mega-menu" id="megaMenu" aria-hidden="true">
+      <nav class="mega-links"><a href="about.html">About <span>01</span></a><a href="academics.html">Academics <span>02</span></a><a href="facilities.html">Facilities <span>03</span></a><a href="admissions.html">Admissions <span>04</span></a><a href="child-blueprint.html">AI Report <span>05</span></a><a href="young-genius.html">Challenge <span>06</span></a><a href="faq.html">FAQ <span>07</span></a><a href="contact.html">Contact <span>08</span></a></nav>
+      <div class="mega-panel"><p class="eyebrow">Future Explorer Challenge</p><h2>A playful 5-minute challenge for young learners.</h2><p>Children complete IQ, observation, math, reading, and creativity rounds to unlock an instant SFIS certificate.</p><a class="primary-button" href="#futureExplorer">Begin</a></div>
+    </aside>
+
+    <main>
+      <section class="page-hero challenge-hero">
+        <div class="page-intro">
+          <p class="eyebrow">Young Genius Challenge</p>
+          <h1>SFIS Future Explorer Challenge.</h1>
+          <p class="lead">A 5-minute interactive game for children aged 5 to 10, ending with a result badge and instant branded certificate.</p>
+        </div>
+      </section>
+
+      <section class="section challenge-section" id="futureExplorer">
+        <div class="challenge-shell">
+          <div class="challenge-intro">
+            <p class="eyebrow">5 rounds</p>
+            <h2>Play, think, observe, read, and imagine.</h2>
+            <div class="challenge-stats" aria-label="Challenge highlights">
+              <span>IQ Questions</span>
+              <span>Observation</span>
+              <span>Fun Math</span>
+              <span>Reading Skills</span>
+              <span>Creativity</span>
+            </div>
+          </div>
+
+          <form class="challenge-form" novalidate>
+            <div class="challenge-profile">
+              <label>Child name<input name="challengeChild" type="text" required /></label>
+              <label>Age<select name="challengeAge" required><option value="">Select</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+            </div>
+
+            <div class="challenge-progress"><span data-challenge-progress></span></div>
+
+            <fieldset class="challenge-round" data-round="1">
+              <legend><span>Round 1</span> IQ Questions</legend>
+              <p>Which one does not belong with the others?</p>
+              <label><input type="radio" name="iq" value="0" required />Apple</label>
+              <label><input type="radio" name="iq" value="0" />Mango</label>
+              <label><input type="radio" name="iq" value="20" />Chair</label>
+              <label><input type="radio" name="iq" value="0" />Banana</label>
+            </fieldset>
+
+            <fieldset class="challenge-round" data-round="2">
+              <legend><span>Round 2</span> Observation Challenge</legend>
+              <p>Look carefully: teal, gold, teal, blue. Which color appears twice?</p>
+              <label><input type="radio" name="observation" value="20" required />Teal</label>
+              <label><input type="radio" name="observation" value="0" />Gold</label>
+              <label><input type="radio" name="observation" value="0" />Blue</label>
+              <label><input type="radio" name="observation" value="0" />All colors</label>
+            </fieldset>
+
+            <fieldset class="challenge-round" data-round="3">
+              <legend><span>Round 3</span> Fun Math</legend>
+              <p>If 6 birds sit on a tree and 4 more join them, how many birds are there?</p>
+              <label><input type="radio" name="math" value="0" required />8</label>
+              <label><input type="radio" name="math" value="20" />10</label>
+              <label><input type="radio" name="math" value="0" />12</label>
+              <label><input type="radio" name="math" value="0" />14</label>
+            </fieldset>
+
+            <fieldset class="challenge-round" data-round="4">
+              <legend><span>Round 4</span> Reading Skills</legend>
+              <p>Read: “Ria planted a seed and watered it every morning.” What did Ria plant?</p>
+              <label><input type="radio" name="reading" value="20" required />A seed</label>
+              <label><input type="radio" name="reading" value="0" />A book</label>
+              <label><input type="radio" name="reading" value="0" />A toy</label>
+              <label><input type="radio" name="reading" value="0" />A pencil</label>
+            </fieldset>
+
+            <fieldset class="challenge-round" data-round="5">
+              <legend><span>Round 5</span> Creativity Questions</legend>
+              <p>If you could invent something for your school, what would you choose?</p>
+              <label><input type="radio" name="creativityChallenge" value="20" required />A helpful learning robot</label>
+              <label><input type="radio" name="creativityChallenge" value="18" />A magic library corner</label>
+              <label><input type="radio" name="creativityChallenge" value="18" />A garden science lab</label>
+              <label><input type="radio" name="creativityChallenge" value="16" />A new sports game</label>
+            </fieldset>
+
+            <p class="challenge-error" role="alert" hidden></p>
+            <button class="primary-button" type="submit">Reveal My Result</button>
+          </form>
+
+          <section class="challenge-result" hidden>
+            <div class="challenge-award-card">
+              <p class="eyebrow">Instant Result</p>
+              <h2 data-challenge-result>Gold Explorer</h2>
+              <strong data-challenge-score>--</strong>
+              <p data-challenge-message>Excellent focus, observation, and creativity.</p>
+            </div>
+            <div class="certificate-card">
+              <p class="eyebrow">Certificate Unlock</p>
+              <h3>Future Explorer Award</h3>
+              <p>Parents can enter email to download the SFIS certificate.</p>
+              <form class="certificate-form" novalidate>
+                <label>Parent email<input name="certificateEmail" type="email" placeholder="parent@example.com" required /></label>
+                <p class="challenge-error" data-certificate-error role="alert" hidden></p>
+                <button class="primary-button" type="submit">Download Certificate</button>
+              </form>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="footer-bottom"><span>Stone Field International School</span><span>Future Explorer Challenge 2026.</span></div></footer>
+    <script src="script.js"></script>
+  </body>
+</html>
