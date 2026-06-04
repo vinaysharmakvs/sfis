@@ -7,6 +7,10 @@ const blueprintLeadForm = document.querySelector(".blueprint-lead-form");
 const blueprintReport = document.querySelector(".blueprint-report");
 const printBlueprintButton = document.querySelector(".print-blueprint");
 const blueprintError = document.querySelector(".blueprint-error");
+const challengeForm = document.querySelector(".challenge-form");
+const challengeResult = document.querySelector(".challenge-result");
+const certificateForm = document.querySelector(".certificate-form");
+const challengeProgress = document.querySelector("[data-challenge-progress]");
 const landingPopup = document.querySelector(".landing-popup");
 const landingPopupClose = document.querySelector(".landing-popup-close");
 const locationSwitches = document.querySelectorAll("[data-location-switch]");
@@ -16,6 +20,8 @@ const locationDirections = document.querySelector("[data-location-directions]");
 const whatsappNumber = "918826758881";
 const landingPopupSeenKey = "sfisLandingPopupSeen";
 const savedBlueprintKey = "sfisFutureSparkReport";
+const blueprintGoogleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdX-9JaaRy0_KRHkWwxy6-IvxYKSPqS3G2UBkYKIKmlQ_TTHw/formResponse";
+const pendingBlueprintLeadKey = "sfisPendingBlueprintLead";
 
 const parentBotQuickQuestions = [
   "When will admissions open?",
@@ -24,6 +30,7 @@ const parentBotQuickQuestions = [
   "Where is the enquiry office?",
   "What facilities are planned?",
   "What is Future Spark AI Report?",
+  "What is Future Explorer Challenge?",
 ];
 
 const parentBotAnswers = [
@@ -71,6 +78,11 @@ const parentBotAnswers = [
     keywords: ["future spark", "ai report", "report", "child report", "strength", "learning style", "child shine"],
     answer:
       "Future Spark AI Report is a parent-friendly interactive experience for children aged 5 to 10. It gives a colorful strength report with learning signals, confidence patterns, growth guidance, and SFIS support areas.",
+  },
+  {
+    keywords: ["challenge", "future explorer", "young genius", "certificate", "award", "game"],
+    answer:
+      "The SFIS Future Explorer Challenge is a 5-minute interactive game for children aged 5 to 10. It includes IQ, observation, fun math, reading, and creativity rounds, followed by an instant Future Explorer Award certificate.",
   },
   {
     keywords: ["founder", "founders", "neha", "vinay", "behind", "managed"],
@@ -330,8 +342,49 @@ function saveLatestBlueprint() {
   }
 }
 
+function submitBlueprintToGoogleForm(data) {
+  const payload = new URLSearchParams();
+  payload.set("entry.1434087836", String(data.get("fatherName") || "").trim());
+  payload.set("entry.533861399", String(data.get("childName") || "").trim());
+  payload.set("entry.2056952779", String(data.get("fatherMobile") || "").trim());
+  payload.set("entry.1366045606", String(data.get("parentEmail") || "").trim());
+
+  if (window.location.protocol === "file:") {
+    localStorage.setItem(pendingBlueprintLeadKey, payload.toString());
+    console.warn("Google Form submission is skipped in file mode. Open the site with http://localhost or publish it online to submit leads.");
+    return;
+  }
+
+  fetch(blueprintGoogleFormUrl, {
+    method: "POST",
+    mode: "no-cors",
+    body: payload,
+  }).catch((error) => {
+    console.warn("Google Form submission could not be completed.", error);
+  });
+}
+
+function submitPendingBlueprintLead() {
+  const pendingPayload = localStorage.getItem(pendingBlueprintLeadKey);
+  if (!pendingPayload || window.location.protocol === "file:") return;
+  fetch(blueprintGoogleFormUrl, {
+    method: "POST",
+    mode: "no-cors",
+    body: new URLSearchParams(pendingPayload),
+  })
+    .then(() => localStorage.removeItem(pendingBlueprintLeadKey))
+    .catch((error) => {
+      console.warn("Pending Google Form submission could not be completed.", error);
+    });
+}
+
+submitPendingBlueprintLead();
+
 const blueprintRequiredFields = [
+  ["fatherName", "Father name"],
   ["childName", "Child name"],
+  ["fatherMobile", "Mobile number"],
+  ["parentEmail", "Parent email"],
   ["age", "Age"],
   ["gender", "Gender"],
   ["subject", "Favourite subject"],
@@ -662,6 +715,143 @@ function renderSavedSparkPreview() {
 
 renderSavedSparkPreview();
 
+let latestChallenge = null;
+
+function updateChallengeProgress() {
+  if (!challengeForm || !challengeProgress) return;
+  const fields = ["challengeChild", "challengeAge", "iq", "observation", "math", "reading", "creativityChallenge"];
+  const data = new FormData(challengeForm);
+  const completed = fields.filter((field) => String(data.get(field) || "").trim()).length;
+  challengeProgress.style.width = `${Math.round(completed / fields.length * 100)}%`;
+}
+
+function showChallengeError(message, target = challengeForm.querySelector(".challenge-error")) {
+  if (!target) return;
+  target.textContent = message;
+  target.hidden = false;
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function clearChallengeErrors() {
+  document.querySelectorAll(".challenge-error").forEach((error) => {
+    error.hidden = true;
+    error.textContent = "";
+  });
+}
+
+function challengeAward(score) {
+  if (score >= 86) {
+    return {
+      title: "Gold Explorer",
+      message: "Outstanding focus, observation, reading, and creative thinking.",
+    };
+  }
+  if (score >= 66) {
+    return {
+      title: "Silver Explorer",
+      message: "Strong effort with bright thinking and growing confidence.",
+    };
+  }
+  return {
+    title: "Bronze Explorer",
+    message: "A wonderful start with curiosity, courage, and imagination.",
+  };
+}
+
+function validateChallenge() {
+  if (!challengeForm) return false;
+  clearChallengeErrors();
+  const data = new FormData(challengeForm);
+  const missing = [];
+  if (!String(data.get("challengeChild") || "").trim()) missing.push("child name");
+  if (!String(data.get("challengeAge") || "").trim()) missing.push("age");
+  ["iq", "observation", "math", "reading", "creativityChallenge"].forEach((field) => {
+    if (!data.get(field)) missing.push(field === "creativityChallenge" ? "creativity round" : `${field} round`);
+  });
+  if (missing.length) {
+    showChallengeError(`Please complete ${missing.join(", ")} before revealing the result.`);
+    return false;
+  }
+  return true;
+}
+
+function createCertificatePdf() {
+  const name = latestChallenge?.childName || "Young Explorer";
+  const award = latestChallenge?.award || "Future Explorer Award";
+  const score = latestChallenge?.score || 0;
+  const lines = [
+    "%PDF-1.4",
+    "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj",
+    "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj",
+    "4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj",
+    "5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj",
+  ];
+  const stream = [
+    "q 0.027 0.067 0.059 rg 0 0 842 595 re f Q",
+    "q 0.165 0.86 0.705 RG 18 18 806 559 re S Q",
+    "q 0.94 0.74 0.31 RG 30 30 782 535 re S Q",
+    "BT /F2 22 Tf 0.165 0.86 0.705 rg 268 520 Td (Stone Field International School) Tj ET",
+    "BT /F2 42 Tf 0.94 0.74 0.31 rg 251 445 Td (Future Explorer Award) Tj ET",
+    "BT /F1 16 Tf 1 1 1 rg 360 404 Td (Presented to) Tj ET",
+    `BT /F2 38 Tf 1 1 1 rg 250 350 Td (${pdfSafeText(name).slice(0, 34)}) Tj ET`,
+    "BT /F1 16 Tf 1 1 1 rg 242 304 Td (for successfully completing the) Tj ET",
+    "BT /F2 20 Tf 0.165 0.86 0.705 rg 183 264 Td (Stone Field International School Future Explorer Challenge 2026) Tj ET",
+    `BT /F2 18 Tf 0.94 0.74 0.31 rg 336 214 Td (${pdfSafeText(award)} - ${score}%) Tj ET`,
+    "BT /F1 12 Tf 1 1 1 rg 306 92 Td (Young Genius Award 2026) Tj ET",
+  ].join("\n");
+  const streamObject = `6 0 obj << /Length ${stream.length} >> stream\n${stream}\nendstream endobj`;
+  const page = "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj";
+  let pdf = `${lines.join("\n")}\n${page}\n${streamObject}\n`;
+  const objects = pdf.match(/\d+ 0 obj/g) || [];
+  const xrefStart = pdf.length;
+  pdf += `xref\n0 7\n0000000000 65535 f \n`;
+  for (let i = 1; i <= 6; i++) {
+    const pos = pdf.indexOf(`${i} 0 obj`);
+    pdf += `${String(pos).padStart(10, "0")} 00000 n \n`;
+  }
+  pdf += `trailer << /Size 7 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+  return new Blob([pdf], { type: "application/pdf" });
+}
+
+challengeForm?.addEventListener("input", updateChallengeProgress);
+challengeForm?.addEventListener("change", updateChallengeProgress);
+
+challengeForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!validateChallenge()) return;
+  const data = new FormData(challengeForm);
+  const score = ["iq", "observation", "math", "reading", "creativityChallenge"].reduce((total, field) => total + Number(data.get(field) || 0), 0);
+  const award = challengeAward(score);
+  latestChallenge = {
+    childName: String(data.get("challengeChild") || "").trim(),
+    age: data.get("challengeAge"),
+    score,
+    award: award.title,
+  };
+  challengeResult.querySelector("[data-challenge-result]").textContent = award.title;
+  challengeResult.querySelector("[data-challenge-score]").textContent = `${score}%`;
+  challengeResult.querySelector("[data-challenge-message]").textContent = award.message;
+  challengeResult.hidden = false;
+  challengeResult.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+certificateForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  clearChallengeErrors();
+  const email = String(new FormData(certificateForm).get("certificateEmail") || "").trim();
+  const error = certificateForm.querySelector("[data-certificate-error]");
+  if (!latestChallenge) {
+    showChallengeError("Please complete the challenge before downloading the certificate.", error);
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showChallengeError("Please enter a valid parent email to download the certificate.", error);
+    return;
+  }
+  const childName = safeDownloadName(latestChallenge.childName);
+  downloadBlob(createCertificatePdf(), `SFIS-Future-Explorer-Award-${childName}.pdf`);
+});
+
 blueprintForm?.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!validateBlueprintForm().isValid) return;
@@ -673,7 +863,10 @@ blueprintForm?.addEventListener("submit", (event) => {
   const sfisAssist = sfisAssistSet(data, archetypeKey);
   const fit = supportFitSet(scores, sfisAssist.length);
   latestBlueprint = {
+    fatherName: data.get("fatherName"),
     childName: data.get("childName"),
+    fatherMobile: data.get("fatherMobile"),
+    parentEmail: data.get("parentEmail"),
     age: data.get("age"),
     gender: data.get("gender"),
     subject: data.get("subject"),
@@ -692,7 +885,13 @@ blueprintForm?.addEventListener("submit", (event) => {
   };
   latestBlueprintSignature = getBlueprintFormSignature(data);
   saveLatestBlueprint();
+  submitBlueprintToGoogleForm(data);
   renderBlueprint();
+  if (blueprintLeadForm) {
+    blueprintLeadForm.elements.parentName.value = latestBlueprint.fatherName || "";
+    blueprintLeadForm.elements.mobile.value = latestBlueprint.fatherMobile || "";
+    blueprintLeadForm.elements.email.value = latestBlueprint.parentEmail || "";
+  }
   blueprintGate.hidden = false;
 });
 
@@ -712,8 +911,11 @@ blueprintLeadForm?.addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(blueprintLeadForm);
   renderBlueprint();
+  const parentName = data.get("parentName") || latestBlueprint?.fatherName || "";
+  const mobile = data.get("mobile") || latestBlueprint?.fatherMobile || "";
+  const email = data.get("email") || latestBlueprint?.parentEmail || "";
   const message = encodeURIComponent(
-    `Hello Stone Field International School, I completed the Future Spark AI Report and would like to register my child for the priority admission interest list for next year. Parent: ${data.get("parentName")}, Mobile: ${data.get("mobile")}, Email: ${data.get("email")}, Child: ${latestBlueprint?.childName}, Age: ${latestBlueprint?.age}, Archetype: ${archetypes[latestBlueprint?.archetypeKey]?.name}, SFIS Support Readiness: ${latestBlueprint?.match}%.`
+    `Hello Stone Field International School, I completed the Future Spark AI Report and would like to register my child for the priority admission interest list for next year. Parent: ${parentName}, Mobile: ${mobile}, Email: ${email}, Child: ${latestBlueprint?.childName}, Age: ${latestBlueprint?.age}, Archetype: ${archetypes[latestBlueprint?.archetypeKey]?.name}, SFIS Support Readiness: ${latestBlueprint?.match}%.`
   );
   window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank", "noopener,noreferrer");
 });
@@ -757,7 +959,10 @@ function buildBlueprintPdfLines() {
     `Generated: ${new Date().toLocaleDateString()}`,
     "",
     "Child Profile",
+    `Father Name: ${latestBlueprint.fatherName}`,
     `Name: ${latestBlueprint.childName}`,
+    `Mobile: ${latestBlueprint.fatherMobile}`,
+    `Email: ${latestBlueprint.parentEmail}`,
     `Age: ${latestBlueprint.age}`,
     `Gender: ${latestBlueprint.gender}`,
     `Favourite Subject: ${latestBlueprint.subject}`,
@@ -950,7 +1155,10 @@ function createStyledBlueprintPdfBlob() {
   y -= 130;
 
   sectionCard("Child Profile", [
+    `Father Name: ${latestBlueprint.fatherName}`,
     `Name: ${latestBlueprint.childName}`,
+    `Mobile: ${latestBlueprint.fatherMobile}`,
+    `Email: ${latestBlueprint.parentEmail}`,
     `Age: ${latestBlueprint.age} | Gender: ${latestBlueprint.gender}`,
     `Favourite Subject: ${latestBlueprint.subject}`,
     `Favourite Activity: ${latestBlueprint.activity}`,
