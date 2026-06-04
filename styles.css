@@ -583,6 +583,240 @@ textarea {
     #07110f;
 }
 
+.challenge-hero {
+  background:
+    linear-gradient(135deg, rgba(7, 17, 15, 0.86), rgba(14, 36, 33, 0.88)),
+    url("assets/robotics-lab.png") center / cover;
+}
+
+.challenge-section {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(240, 189, 79, 0.14), transparent 30%),
+    radial-gradient(circle at 86% 6%, rgba(42, 219, 180, 0.18), transparent 28%),
+    #07110f;
+}
+
+.challenge-teaser {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.52fr);
+  gap: clamp(20px, 4vw, 48px);
+  align-items: center;
+  background:
+    radial-gradient(circle at 88% 16%, rgba(240, 189, 79, 0.16), transparent 28%),
+    #07110f;
+}
+
+.challenge-teaser p {
+  color: var(--soft);
+  line-height: 1.7;
+}
+
+.challenge-mini-card {
+  display: grid;
+  gap: 14px;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid rgba(198, 255, 230, 0.18);
+  border-radius: 8px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(42, 219, 180, 0.09));
+  box-shadow: var(--shadow);
+}
+
+.challenge-mini-card span {
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.challenge-mini-card strong {
+  color: var(--ink);
+  font-size: clamp(1.45rem, 4vw, 2.5rem);
+  line-height: 1;
+}
+
+.challenge-shell {
+  display: grid;
+  gap: 22px;
+}
+
+.challenge-intro,
+.challenge-form,
+.challenge-result > *,
+.challenge-round {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.challenge-intro {
+  padding: clamp(22px, 4vw, 40px);
+}
+
+.challenge-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.challenge-stats span {
+  padding: 9px 12px;
+  color: var(--night);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--teal), var(--gold));
+  font-size: 0.86rem;
+  font-weight: 950;
+}
+
+.challenge-form {
+  display: grid;
+  gap: 16px;
+  padding: clamp(20px, 3vw, 34px);
+}
+
+.challenge-profile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.35fr);
+  gap: 14px;
+}
+
+.challenge-profile label,
+.certificate-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  font-weight: 850;
+}
+
+.challenge-profile input,
+.challenge-profile select,
+.certificate-form input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.challenge-progress {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.challenge-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--teal), var(--gold));
+  transition: width 220ms ease;
+}
+
+.challenge-round {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 18px;
+}
+
+.challenge-round legend {
+  padding: 0 8px;
+  color: var(--gold);
+  font-weight: 950;
+}
+
+.challenge-round legend span {
+  color: var(--teal);
+}
+
+.challenge-round p {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 850;
+  line-height: 1.45;
+}
+
+.challenge-round label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px;
+  color: var(--soft);
+  border: 1px solid rgba(198, 255, 230, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  font-weight: 750;
+}
+
+.challenge-round:focus-within {
+  border-color: rgba(42, 219, 180, 0.54);
+}
+
+.challenge-error {
+  margin: 0;
+  padding: 12px 14px;
+  color: #ffe9e1;
+  border: 1px solid rgba(255, 117, 90, 0.7);
+  border-radius: 8px;
+  background: rgba(255, 82, 54, 0.14);
+  font-weight: 850;
+  line-height: 1.5;
+}
+
+.challenge-error[hidden] {
+  display: none;
+}
+
+.challenge-result {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(300px, 0.65fr);
+  gap: 18px;
+}
+
+.challenge-result[hidden] {
+  display: none;
+}
+
+.challenge-award-card,
+.certificate-card {
+  padding: clamp(22px, 4vw, 38px);
+}
+
+.challenge-award-card {
+  background:
+    linear-gradient(135deg, rgba(42, 219, 180, 0.16), rgba(240, 189, 79, 0.12)),
+    rgba(255, 255, 255, 0.06);
+}
+
+.challenge-award-card h2 {
+  color: var(--gold);
+}
+
+.challenge-award-card strong {
+  display: block;
+  margin: 12px 0;
+  color: var(--teal);
+  font-size: clamp(3rem, 10vw, 7rem);
+  line-height: 0.9;
+}
+
+.certificate-card {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.certificate-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
 .blueprint-form,
 .blueprint-gate,
 .blueprint-report {
@@ -2088,6 +2322,7 @@ h3 {
   .contact-section,
   .faq-teaser,
   .blueprint-teaser,
+  .challenge-teaser,
   .blueprint-gate,
   .media-showcase,
   .mega-menu {
@@ -2111,7 +2346,9 @@ h3 {
 
   .blueprint-fields,
   .choice-grid,
-  .report-grid {
+  .report-grid,
+  .challenge-profile,
+  .challenge-result {
     grid-template-columns: 1fr;
   }
 
