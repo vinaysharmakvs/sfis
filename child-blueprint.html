@@ -5,16 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Future Spark AI Report | Stone Field International School</title>
     <meta name="description" content="Discover your child's strengths, learning personality, and growth signals with the Future Spark AI Report experience." />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <meta name="theme-color" content="#07110f" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="index.html"><span class="brand-mark">SFIS</span><span><strong>Stone Field</strong><small>International School</small></span></a>
-      <nav class="desktop-nav"><a href="index.html">Home</a><a href="about.html">About</a><a href="academics.html">Academics</a><a href="facilities.html">Facilities</a><a href="admissions.html">Admissions</a><a class="is-active" href="child-blueprint.html">AI Report</a><a href="faq.html">FAQ</a><a href="contact.html">Contact</a></nav>
+      <nav class="desktop-nav"><a href="index.html">Home</a><a href="about.html">About</a><a href="academics.html">Academics</a><a href="facilities.html">Facilities</a><a href="admissions.html">Admissions</a><a class="is-active" href="child-blueprint.html">AI Report</a><a href="young-genius.html">Challenge</a><a href="faq.html">FAQ</a><a href="contact.html">Contact</a></nav>
       <div class="header-actions"><a class="chip-link" href="#blueprintTool">Start Test</a><button class="menu-button" type="button" aria-expanded="false" aria-controls="megaMenu" aria-label="Open menu"><span></span><span></span><span></span></button></div>
     </header>
     <aside class="mega-menu" id="megaMenu" aria-hidden="true">
-      <nav class="mega-links"><a href="about.html">About <span>01</span></a><a href="academics.html">Academics <span>02</span></a><a href="facilities.html">Facilities <span>03</span></a><a href="admissions.html">Admissions <span>04</span></a><a href="child-blueprint.html">AI Report <span>05</span></a><a href="faq.html">FAQ <span>06</span></a><a href="contact.html">Contact <span>07</span></a></nav>
+      <nav class="mega-links"><a href="about.html">About <span>01</span></a><a href="academics.html">Academics <span>02</span></a><a href="facilities.html">Facilities <span>03</span></a><a href="admissions.html">Admissions <span>04</span></a><a href="child-blueprint.html">AI Report <span>05</span></a><a href="young-genius.html">Challenge <span>06</span></a><a href="faq.html">FAQ <span>07</span></a><a href="contact.html">Contact <span>08</span></a></nav>
       <div class="mega-panel"><p class="eyebrow">Future Spark AI Report</p><h2>Discover strengths and growth signals.</h2><p>A parent-friendly AI-inspired reflection tool for children aged 5 to 10 years.</p><a class="primary-button" href="#blueprintTool">Start</a></div>
     </aside>
 
@@ -33,7 +39,10 @@
             <p class="eyebrow">Step 1</p>
             <h2>Child Profile</h2>
             <div class="blueprint-fields">
+              <label>Father name<input name="fatherName" type="text" required /></label>
               <label>Child name<input name="childName" type="text" required /></label>
+              <label>Mobile number<input name="fatherMobile" type="tel" required /></label>
+              <label>Parent email<input name="parentEmail" type="email" required /></label>
               <label>Age<select name="age" required><option value="">Select</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
               <label>Gender<select name="gender" required><option value="">Select</option><option>Girl</option><option>Boy</option><option>Prefer not to say</option></select></label>
               <label>Favourite subject<input name="subject" type="text" placeholder="Science, English, Maths..." required /></label>
