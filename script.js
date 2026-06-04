@@ -1090,42 +1090,96 @@ function validateChallenge() {
   return true;
 }
 
-function createCertificatePdf() {
+function loadCertificateImage(src) {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => resolve(null);
+    image.src = src;
+  });
+}
+
+function drawWrappedCanvasText(ctx, value, x, y, maxWidth, lineHeight, maxLines = 2) {
+  const words = String(value).split(/\s+/);
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    const nextLine = line ? `${line} ${word}` : word;
+    if (ctx.measureText(nextLine).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = nextLine;
+    }
+  });
+  if (line) lines.push(line);
+  lines.slice(0, maxLines).forEach((text, index) => {
+    ctx.fillText(index === maxLines - 1 && lines.length > maxLines ? `${text}...` : text, x, y + index * lineHeight);
+  });
+}
+
+function drawCanvasRoundRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+async function createCertificateImageBlob() {
   const name = latestChallenge?.childName || "Young Explorer";
   const award = latestChallenge?.award || "Future Explorer Award";
   const score = latestChallenge?.score || 0;
-  const lines = [
-    "%PDF-1.4",
-    "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj",
-    "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj",
-    "4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj",
-    "5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj",
-  ];
-  const stream = [
-    "q 0.027 0.067 0.059 rg 0 0 842 595 re f Q",
-    "q 0.165 0.86 0.705 RG 18 18 806 559 re S Q",
-    "q 0.94 0.74 0.31 RG 30 30 782 535 re S Q",
-    "BT /F2 22 Tf 0.165 0.86 0.705 rg 268 520 Td (Stone Field International School) Tj ET",
-    "BT /F2 42 Tf 0.94 0.74 0.31 rg 251 445 Td (Future Explorer Award) Tj ET",
-    "BT /F1 16 Tf 1 1 1 rg 360 404 Td (Presented to) Tj ET",
-    `BT /F2 38 Tf 1 1 1 rg 250 350 Td (${pdfSafeText(name).slice(0, 34)}) Tj ET`,
-    "BT /F1 16 Tf 1 1 1 rg 242 304 Td (for successfully completing the) Tj ET",
-    "BT /F2 20 Tf 0.165 0.86 0.705 rg 183 264 Td (Stone Field International School Future Explorer Challenge 2026) Tj ET",
-    `BT /F2 18 Tf 0.94 0.74 0.31 rg 336 214 Td (${pdfSafeText(award)} - ${score}%) Tj ET`,
-    "BT /F1 12 Tf 1 1 1 rg 306 92 Td (Young Genius Award 2026) Tj ET",
-  ].join("\n");
-  const streamObject = `6 0 obj << /Length ${stream.length} >> stream\n${stream}\nendstream endobj`;
-  const page = "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj";
-  let pdf = `${lines.join("\n")}\n${page}\n${streamObject}\n`;
-  const objects = pdf.match(/\d+ 0 obj/g) || [];
-  const xrefStart = pdf.length;
-  pdf += `xref\n0 7\n0000000000 65535 f \n`;
-  for (let i = 1; i <= 6; i++) {
-    const pos = pdf.indexOf(`${i} 0 obj`);
-    pdf += `${String(pos).padStart(10, "0")} 00000 n \n`;
-  }
-  pdf += `trailer << /Size 7 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
-  return new Blob([pdf], { type: "application/pdf" });
+  const sealUrl = new URL("assets/sfis_seal.png", window.location.href).href;
+  const xml = (value) =>
+    String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120">
+  <defs>
+    <linearGradient id="sfisBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07110f"/>
+      <stop offset="0.42" stop-color="#12332d"/>
+      <stop offset="1" stop-color="#f0bd4f"/>
+    </linearGradient>
+    <clipPath id="sealClip"><circle cx="800" cy="355" r="112"/></clipPath>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#07110f" flood-opacity="0.24"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="1120" fill="url(#sfisBg)"/>
+  <circle cx="230" cy="190" r="210" fill="#2adbb4" opacity="0.16"/>
+  <circle cx="1400" cy="920" r="270" fill="#ffffff" opacity="0.09"/>
+  <rect x="80" y="80" width="1440" height="960" rx="36" fill="#fbfff8" filter="url(#softShadow)"/>
+  <rect x="80" y="80" width="1440" height="960" rx="36" fill="none" stroke="#2adbb4" stroke-width="8"/>
+  <rect x="122" y="122" width="1356" height="876" fill="none" stroke="#f0bd4f" stroke-width="4"/>
+  <text x="800" y="205" text-anchor="middle" fill="#07110f" font-family="Arial, sans-serif" font-size="44" font-weight="900">Stone Field International School</text>
+  <text x="800" y="246" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="22" font-weight="700">Future Explorer Challenge 2026</text>
+  <circle cx="800" cy="355" r="112" fill="#07110f"/>
+  <text x="800" y="374" text-anchor="middle" fill="#f0bd4f" font-family="Arial, sans-serif" font-size="54" font-weight="900">SFIS</text>
+  <image href="${xml(sealUrl)}" x="688" y="243" width="224" height="224" preserveAspectRatio="xMidYMid slice" clip-path="url(#sealClip)"/>
+  <circle cx="800" cy="355" r="122" fill="none" stroke="#f0bd4f" stroke-width="12"/>
+  <circle cx="800" cy="355" r="137" fill="none" stroke="#2adbb4" stroke-width="4"/>
+  <text x="800" y="555" text-anchor="middle" fill="#f0bd4f" font-family="Arial, sans-serif" font-size="70" font-weight="900">Future Explorer Award</text>
+  <text x="800" y="612" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="26" font-weight="700">Presented to</text>
+  <text x="800" y="710" text-anchor="middle" fill="#07110f" font-family="Arial, sans-serif" font-size="72" font-weight="900">${xml(name).slice(0, 38)}</text>
+  <text x="800" y="810" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="28" font-weight="700">for successfully completing the</text>
+  <text x="800" y="860" text-anchor="middle" fill="#12332d" font-family="Arial, sans-serif" font-size="34" font-weight="900">Stone Field International School Future Explorer Challenge</text>
+  <rect x="535" y="905" width="530" height="74" rx="37" fill="#07110f"/>
+  <text x="800" y="953" text-anchor="middle" fill="#2adbb4" font-family="Arial, sans-serif" font-size="30" font-weight="900">${xml(award)} | Score ${xml(score)}%</text>
+  <text x="360" y="1000" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="20" font-weight="700">Young Genius Award 2026</text>
+  <text x="1240" y="1000" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="20" font-weight="700">Official SFIS Seal</text>
+</svg>`;
+  return new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
 }
 
 renderChallengeQuestions();
@@ -1159,7 +1213,7 @@ challengeForm?.addEventListener("submit", (event) => {
   challengeResult.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-certificateForm?.addEventListener("submit", (event) => {
+certificateForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   clearChallengeErrors();
   const email = String(new FormData(certificateForm).get("certificateEmail") || "").trim();
@@ -1173,7 +1227,25 @@ certificateForm?.addEventListener("submit", (event) => {
     return;
   }
   const childName = safeDownloadName(latestChallenge.childName);
-  downloadBlob(createCertificatePdf(), `SFIS-Future-Explorer-Award-${childName}.pdf`);
+  const button = certificateForm.querySelector("button");
+  const previousText = button?.textContent || "Download Certificate";
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Creating Certificate...";
+  }
+  try {
+    const certificate = await createCertificateImageBlob();
+    if (!certificate) throw new Error("Certificate image was empty.");
+    downloadBlob(certificate, `SFIS-Future-Explorer-Certificate-${childName}.svg`);
+  } catch (error) {
+    showChallengeError("Certificate could not be created. Please try again.", certificateForm.querySelector("[data-certificate-error]"));
+    console.warn("Certificate download failed.", error);
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = previousText;
+    }
+  }
 });
 
 blueprintForm?.addEventListener("submit", (event) => {
