@@ -1143,6 +1143,29 @@ async function createCertificateImageBlob() {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  const splitSvgText = (value, maxChars = 24, maxLines = 2) => {
+    const words = String(value || "").trim().split(/\s+/).filter(Boolean);
+    const lines = [];
+    let current = "";
+    words.forEach((word) => {
+      const next = current ? `${current} ${word}` : word;
+      if (next.length > maxChars && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = next;
+      }
+    });
+    if (current) lines.push(current);
+    if (!lines.length) lines.push("Young Explorer");
+    return lines.slice(0, maxLines);
+  };
+  const nameLines = splitSvgText(name, 24, 2);
+  const nameFontSize = nameLines.length > 1 ? 48 : String(name).length > 24 ? 56 : 64;
+  const nameText = nameLines
+    .map((line, index) => `<tspan x="800" dy="${index === 0 ? 0 : nameFontSize + 8}">${xml(line)}</tspan>`)
+    .join("");
+  const nameStartY = nameLines.length > 1 ? 642 : 674;
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120">
   <defs>
@@ -1151,7 +1174,7 @@ async function createCertificateImageBlob() {
       <stop offset="0.42" stop-color="#12332d"/>
       <stop offset="1" stop-color="#f0bd4f"/>
     </linearGradient>
-    <clipPath id="sealClip"><circle cx="800" cy="355" r="112"/></clipPath>
+    <clipPath id="sealClip"><circle cx="800" cy="345" r="88"/></clipPath>
     <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#07110f" flood-opacity="0.24"/>
     </filter>
@@ -1162,20 +1185,20 @@ async function createCertificateImageBlob() {
   <rect x="80" y="80" width="1440" height="960" rx="36" fill="#fbfff8" filter="url(#softShadow)"/>
   <rect x="80" y="80" width="1440" height="960" rx="36" fill="none" stroke="#2adbb4" stroke-width="8"/>
   <rect x="122" y="122" width="1356" height="876" fill="none" stroke="#f0bd4f" stroke-width="4"/>
-  <text x="800" y="205" text-anchor="middle" fill="#07110f" font-family="Arial, sans-serif" font-size="44" font-weight="900">Stone Field International School</text>
-  <text x="800" y="246" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="22" font-weight="700">Future Explorer Challenge 2026</text>
-  <circle cx="800" cy="355" r="112" fill="#07110f"/>
-  <text x="800" y="374" text-anchor="middle" fill="#f0bd4f" font-family="Arial, sans-serif" font-size="54" font-weight="900">SFIS</text>
-  <image href="${xml(sealUrl)}" x="688" y="243" width="224" height="224" preserveAspectRatio="xMidYMid slice" clip-path="url(#sealClip)"/>
-  <circle cx="800" cy="355" r="122" fill="none" stroke="#f0bd4f" stroke-width="12"/>
-  <circle cx="800" cy="355" r="137" fill="none" stroke="#2adbb4" stroke-width="4"/>
-  <text x="800" y="555" text-anchor="middle" fill="#f0bd4f" font-family="Arial, sans-serif" font-size="70" font-weight="900">Future Explorer Award</text>
-  <text x="800" y="612" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="26" font-weight="700">Presented to</text>
-  <text x="800" y="710" text-anchor="middle" fill="#07110f" font-family="Arial, sans-serif" font-size="72" font-weight="900">${xml(name).slice(0, 38)}</text>
-  <text x="800" y="810" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="28" font-weight="700">for successfully completing the</text>
-  <text x="800" y="860" text-anchor="middle" fill="#12332d" font-family="Arial, sans-serif" font-size="34" font-weight="900">Stone Field International School Future Explorer Challenge</text>
-  <rect x="535" y="905" width="530" height="74" rx="37" fill="#07110f"/>
-  <text x="800" y="953" text-anchor="middle" fill="#2adbb4" font-family="Arial, sans-serif" font-size="30" font-weight="900">${xml(award)} | Score ${xml(score)}%</text>
+  <text x="800" y="195" text-anchor="middle" fill="#07110f" font-family="Arial, sans-serif" font-size="40" font-weight="900">Stone Field International School</text>
+  <text x="800" y="234" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="21" font-weight="700">Future Explorer Challenge 2026</text>
+  <circle cx="800" cy="345" r="88" fill="#07110f"/>
+  <text x="800" y="363" text-anchor="middle" fill="#f0bd4f" font-family="Arial, sans-serif" font-size="42" font-weight="900">SFIS</text>
+  <image href="${xml(sealUrl)}" x="712" y="257" width="176" height="176" preserveAspectRatio="xMidYMid slice" clip-path="url(#sealClip)"/>
+  <circle cx="800" cy="345" r="98" fill="none" stroke="#f0bd4f" stroke-width="10"/>
+  <circle cx="800" cy="345" r="111" fill="none" stroke="#2adbb4" stroke-width="4"/>
+  <text x="800" y="510" text-anchor="middle" fill="#f0bd4f" font-family="Arial, sans-serif" font-size="58" font-weight="900">Future Explorer Award</text>
+  <text x="800" y="565" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="25" font-weight="700">Presented to</text>
+  <text x="800" y="${nameStartY}" text-anchor="middle" fill="#07110f" font-family="Arial, sans-serif" font-size="${nameFontSize}" font-weight="900">${nameText}</text>
+  <text x="800" y="785" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="25" font-weight="700">for successfully completing the</text>
+  <text x="800" y="832" text-anchor="middle" fill="#12332d" font-family="Arial, sans-serif" font-size="30" font-weight="900">Stone Field International School Future Explorer Challenge</text>
+  <rect x="560" y="884" width="480" height="66" rx="33" fill="#07110f"/>
+  <text x="800" y="927" text-anchor="middle" fill="#2adbb4" font-family="Arial, sans-serif" font-size="27" font-weight="900">${xml(award)} | Score ${xml(score)}%</text>
   <text x="360" y="1000" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="20" font-weight="700">Young Genius Award 2026</text>
   <text x="1240" y="1000" text-anchor="middle" fill="#51615c" font-family="Arial, sans-serif" font-size="20" font-weight="700">Official SFIS Seal</text>
 </svg>`;
