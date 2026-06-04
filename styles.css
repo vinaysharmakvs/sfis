@@ -507,6 +507,12 @@ textarea {
   font-weight: 900;
 }
 
+.challenge-tags span {
+  color: var(--ink);
+  border-color: rgba(198, 255, 230, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .spark-preview {
   display: grid;
   gap: 14px;
@@ -808,7 +814,27 @@ textarea {
 }
 
 .certificate-card {
+  position: relative;
   background: rgba(255, 255, 255, 0.08);
+}
+
+.certificate-seal-preview {
+  display: grid;
+  place-items: center;
+  width: 94px;
+  height: 94px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  background: var(--night);
+  box-shadow: 0 0 36px rgba(240, 189, 79, 0.24);
+}
+
+.certificate-seal-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .certificate-form {
