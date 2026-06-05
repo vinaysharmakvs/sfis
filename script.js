@@ -47,7 +47,7 @@ const parentBotAnswers = [
   {
     keywords: ["kidsverse", "priority", "reservation", "reserved", "50", "preference"],
     answer:
-      "Eligible Kidsverse students will receive admission priority, with 50% of available seats reserved as a gratitude gesture to families who trusted the founders from the beginning.",
+      "Eligible Kidsverse students will receive admission priority, with 50% of available seats reserved as a gratitude gesture to families who trusted the founders from the beginning. Kidsverse School website: kidsverseschool.com.",
   },
   {
     keywords: ["seat", "limited", "availability", "quantity", "batch", "super 30"],
@@ -62,7 +62,7 @@ const parentBotAnswers = [
   {
     keywords: ["office", "enquiry", "address", "kidsverse school", "rehan", "construction"],
     answer:
-      "The temporary enquiry office is Kidsverse School, Rehan, until SFIS construction is complete. Parents can visit there for guidance, priority list registration, and next steps.",
+      "The temporary enquiry office is Kidsverse School, Rehan, until SFIS construction is complete. Parents can visit there for guidance, priority list registration, and next steps. Kidsverse School website: kidsverseschool.com.",
   },
   {
     keywords: ["location", "campus", "where", "shani", "mandir", "kukhnaira", "map"],
@@ -87,7 +87,7 @@ const parentBotAnswers = [
   {
     keywords: ["founder", "founders", "neha", "vinay", "behind", "managed"],
     answer:
-      "Stone Field International School is founded by Neha Sharma and Vinay Sharma, the same team behind Kidsverse Playschool Rehan and the After School Activity Center Rehan.",
+      "Stone Field International School is founded by Neha Sharma and Vinay Sharma, the same team behind Kidsverse Playschool Rehan and the After School Activity Center Rehan. You can visit Kidsverse at kidsverseschool.com.",
   },
   {
     keywords: ["app", "diary", "parent update", "communication", "homework", "attendance"],
