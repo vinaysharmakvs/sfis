@@ -17,6 +17,17 @@ const locationSwitches = document.querySelectorAll("[data-location-switch]");
 const locationCards = document.querySelectorAll("[data-location-card]");
 const locationMap = document.querySelector("[data-location-map]");
 const locationDirections = document.querySelector("[data-location-directions]");
+const resourceDownloadButtons = document.querySelectorAll("[data-resource-download]");
+const resourceLeadModal = document.querySelector(".resource-lead-modal");
+const resourceLeadForm = document.querySelector(".resource-lead-form");
+const resourceLeadError = document.querySelector(".resource-lead-error");
+const resourceLeadTitleInput = document.querySelector('input[name="resourceTitle"]');
+const futureCompassForm = document.querySelector(".future-compass-form");
+const futureCompassQuestions = document.querySelector("[data-fc-questions]");
+const futureCompassProgress = document.querySelector("[data-fc-progress]");
+const futureCompassError = document.querySelector(".future-compass-error");
+const futureCompassReport = document.querySelector(".future-compass-report");
+const futureCompassDownload = document.querySelector("[data-fc-download]");
 const whatsappNumber = "918826758881";
 const landingPopupSeenKey = "sfisLandingPopupSeen";
 const savedBlueprintKey = "sfisFutureSparkReport";
@@ -30,7 +41,9 @@ const parentBotQuickQuestions = [
   "Where is the enquiry office?",
   "What facilities are planned?",
   "What is Future Spark AI Report?",
+  "What is Future Compass AI?",
   "What is Future Explorer Challenge?",
+  "Do you have parent resources?",
 ];
 
 const parentBotAnswers = [
@@ -78,6 +91,16 @@ const parentBotAnswers = [
     keywords: ["future spark", "ai report", "report", "child report", "strength", "learning style", "child shine"],
     answer:
       "Future Spark AI Report is a parent-friendly interactive experience for children aged 5 to 10. It gives a colorful strength report with learning signals, confidence patterns, growth guidance, and SFIS support areas.",
+  },
+  {
+    keywords: ["future compass", "stream", "career", "grade 8", "grade 9", "grade 10", "science", "commerce", "humanities", "medical"],
+    answer:
+      "SFIS Future Compass AI is for Grade 8 onward students and parents. It helps families compare personality, interests, aptitude, pressure readiness, child preference, and parent preference before making stream and career direction decisions after Grade 10.",
+  },
+  {
+    keywords: ["resource", "resources", "download", "checklist", "reading", "screen time", "summer planner", "questions"],
+    answer:
+      "Yes. The Parent Resource Library has free downloads including a reading checklist, school readiness checklist, screen time guide, 50 questions to ask your child, and a summer learning planner. Open resources.html from the website menu.",
   },
   {
     keywords: ["challenge", "future explorer", "young genius", "certificate", "award", "game"],
@@ -332,6 +355,7 @@ const archetypes = {
 
 let latestBlueprint = null;
 let latestBlueprintSignature = "";
+let pendingResourceDownloadKey = "";
 
 function saveLatestBlueprint() {
   if (!latestBlueprint) return;
@@ -379,6 +403,25 @@ function submitChallengeToGoogleForm(data) {
     childName: data.get("challengeChild"),
     mobile: data.get("challengeFatherMobile"),
     email: data.get("challengeFatherEmail"),
+  });
+}
+
+function submitResourceToGoogleForm(data, resource) {
+  const childName = String(data.get("resourceChildName") || "").trim();
+  submitLeadToGoogleForm({
+    fatherName: data.get("resourceParentName"),
+    childName: `${childName} | Resource: ${resource.title}`,
+    mobile: data.get("resourceMobile"),
+    email: data.get("resourceEmail"),
+  });
+}
+
+function submitFutureCompassToGoogleForm(data) {
+  submitLeadToGoogleForm({
+    fatherName: data.get("fcParentName"),
+    childName: `${data.get("fcStudentName")} | Future Compass ${data.get("fcGrade")}`,
+    mobile: data.get("fcMobile"),
+    email: data.get("fcEmail"),
   });
 }
 
@@ -1655,6 +1698,1508 @@ function downloadBlob(blob, filename) {
   URL.revokeObjectURL(link.href);
   link.remove();
 }
+
+const futureCompassStreams = {
+  medical: "Science Medical",
+  nonMedical: "Science Non-Medical",
+  commerce: "Commerce",
+  humanities: "Humanities",
+  defence: "Defence",
+  creative: "Creative",
+  sports: "Sports",
+  vocational: "Skill / Vocational",
+  agriculture: "Agriculture",
+  hospitality: "Hotel & Hospitality",
+  aviation: "Aviation",
+  emerging: "Emerging AI Careers",
+};
+
+const futureCompassTraits = {
+  logical: "Logical Thinking",
+  creative: "Creativity",
+  analytical: "Analytical Ability",
+  practical: "Practical Skill",
+  communication: "Communication",
+  resilience: "Pressure Readiness",
+  empathy: "People Understanding",
+  leadership: "Leadership",
+};
+
+const futureCompassCareers = {
+  medical: ["MBBS", "BDS", "Veterinary Science", "Nursing", "Physiotherapy", "Biotechnology", "Genetic Engineering", "Biomedical Engineering", "AI in Healthcare", "Clinical Psychology", "Medical Research", "Pharmacology", "Public Health", "Nutrition", "Occupational Therapy", "Speech Therapy", "Neuroscience", "Radiology", "Medical Coding", "Health Informatics"],
+  nonMedical: ["Computer Science Engineering", "AI Engineer", "Machine Learning Engineer", "Robotics Engineer", "Data Scientist", "Cyber Security Expert", "Cloud Engineer", "Drone Engineer", "Space Engineer", "ISRO Scientist", "Civil Engineer", "Mechanical Engineer", "Electronics Engineer", "Semiconductor Engineer", "Embedded Systems Engineer", "Quantum Computing Researcher", "Game Developer", "UI UX Designer", "AR VR Developer", "Digital Twin Engineer"],
+  commerce: ["CA", "CS", "CMA", "Investment Banker", "Stock Market Analyst", "Financial Planner", "Economist", "Auditor", "Actuary", "Business Analyst", "Digital Marketing Strategist", "Entrepreneur", "Brand Manager", "Supply Chain Manager", "International Business", "Retail Management", "E-Commerce Manager", "FinTech Specialist", "Insurance Advisor", "Risk Analyst"],
+  humanities: ["Lawyer", "Judge", "IAS", "IPS", "IFS", "Professor", "Psychologist", "Journalist", "Content Creator", "Film Maker", "Animator", "Interior Designer", "Fashion Designer", "Social Worker", "International Relations Specialist", "Diplomat", "Public Policy Expert", "Political Consultant", "Historian", "Museum Curator"],
+  defence: ["NDA", "CDS", "Army Officer", "Navy Officer", "Air Force Officer", "Coast Guard", "Paramilitary Forces", "DRDO", "ISRO", "Police Services", "CAPF", "Defence Technology", "Aviation Defence", "Cyber Defence", "Logistics Officer"],
+  sports: ["Professional Athlete", "Coach", "Sports Scientist", "Sports Nutritionist", "Sports Physiotherapist", "Sports Psychologist", "Fitness Trainer", "Sports Analytics Expert", "Sports Management", "Yoga Instructor", "Adventure Sports", "Physical Education Teacher"],
+  creative: ["Graphic Designer", "Animation Artist", "Film Director", "Photographer", "Music Producer", "Game Designer", "VFX Artist", "YouTube Creator", "Podcaster", "Writer", "Advertising Professional", "Brand Storyteller", "Product Designer", "UI UX Designer", "Creative Technologist"],
+  vocational: ["Coding Specialist", "Digital Marketing", "Electric Vehicle Technician", "3D Printing Specialist", "Mobile Repair", "Web Developer", "App Developer", "Entrepreneurship", "Interior Execution", "Beauty and Wellness", "Event Management", "Retail Operations", "Data Entry and Analytics", "Financial Services"],
+  agriculture: ["Agricultural Scientist", "Food Technology", "Organic Farming", "Dairy Technology", "Fisheries", "Forestry", "Horticulture", "Agribusiness", "Soil Scientist", "Climate-Smart Agriculture"],
+  hospitality: ["Hotel Management", "Chef", "Cruise Management", "Luxury Hospitality", "Event Management", "Travel Consultant", "Airline Cabin Crew", "Aviation Management", "Tourism Entrepreneurship", "Resort Management"],
+  aviation: ["Commercial Pilot", "Air Traffic Controller", "Aircraft Maintenance Engineer", "Airport Management", "Drone Pilot", "Flight Dispatcher", "Aerospace Engineering", "Cabin Crew", "Aviation Safety", "Ground Operations"],
+  emerging: ["AI Prompt Engineer", "AI Trainer", "AI Ethics Consultant", "Climate Scientist", "Sustainability Consultant", "Renewable Energy Engineer", "EV Engineer", "Space Tourism Specialist", "Bioinformatics", "Quantum Engineer", "Digital Health Specialist", "XR Developer", "AI Product Manager", "Prompt Designer", "AI Educator", "AI Lawyer", "Synthetic Biology", "Nanotechnology", "Computational Biology", "Robotics Product Designer"],
+};
+
+const futureCompassDemand = {
+  medical: { salary: "Long study path, high trust careers", demand: "High", ai: "AI assists diagnosis, research, records, and monitoring", balance: "Varies by specialization" },
+  nonMedical: { salary: "Wide range, strong top-end in tech", demand: "Very high in AI, data, cloud, robotics", ai: "AI changes tools but increases demand for strong problem solvers", balance: "Better in product and tech roles" },
+  commerce: { salary: "Strong for finance, CA, business and analytics", demand: "High in finance, business, FinTech", ai: "AI automates routine work; judgement and strategy matter more", balance: "Depends on role and exam path" },
+  humanities: { salary: "Strong in law, civil services, policy, media and design", demand: "Growing where communication and human insight matter", ai: "AI supports research; original thinking remains valuable", balance: "Often flexible after specialization" },
+  defence: { salary: "Stable, respected, benefits-led career path", demand: "Selective and competitive", ai: "Technology and cyber defence are becoming important", balance: "High discipline and service commitment" },
+  creative: { salary: "Portfolio-driven with high upside", demand: "Growing in digital media, design and content", ai: "AI raises speed; taste, originality and storytelling matter", balance: "Flexible but deadline-driven" },
+  sports: { salary: "Performance and specialization driven", demand: "Growing in coaching, analytics and fitness", ai: "Data and wearable tech improve training decisions", balance: "Physically demanding" },
+  vocational: { salary: "Skill-based earning can start early", demand: "Strong for practical and digital skills", ai: "AI tools reward hands-on adaptability", balance: "Often entrepreneurial" },
+  agriculture: { salary: "Growing with tech, food and sustainability", demand: "Rising in food security and climate-smart farming", ai: "AI improves yield, soil and weather decisions", balance: "Field and business mix" },
+  hospitality: { salary: "Good growth in luxury and travel sectors", demand: "High where service quality matters", ai: "AI supports operations; human service remains central", balance: "Shift-based and people-facing" },
+  aviation: { salary: "High potential with strict training and licensing", demand: "Selective, cyclical and skill-intensive", ai: "Automation supports safety but trained professionals remain vital", balance: "Role-dependent, travel-heavy" },
+  emerging: { salary: "Fast-moving, high upside for early learners", demand: "Very high in AI, climate, digital health and deep tech", ai: "These careers are built around AI-era skills", balance: "Project-driven and evolving" },
+};
+
+const futureCompassOptionFactors = [
+  ["Strongly true", 1],
+  ["Somewhat true", 0.68],
+  ["Not sure", 0.35],
+  ["Rarely true", 0],
+];
+
+function fcWeights(streams = {}, traits = {}) {
+  return { streams, traits };
+}
+
+const futureCompassQuestionSections = [
+  {
+    title: "Personality",
+    questions: [
+      ["My child keeps trying when a difficult problem appears.", fcWeights({ nonMedical: 2, medical: 1, defence: 1, emerging: 1 }, { resilience: 3, analytical: 1 })],
+      ["My child enjoys leading a group or taking responsibility.", fcWeights({ commerce: 1, defence: 2, sports: 1, humanities: 1 }, { leadership: 3, communication: 1 })],
+      ["My child notices how others feel and tries to help.", fcWeights({ medical: 1, humanities: 2, hospitality: 1 }, { empathy: 3, communication: 1 })],
+      ["My child likes building, fixing, experimenting or making things work.", fcWeights({ nonMedical: 3, vocational: 2, emerging: 1 }, { practical: 3, logical: 1 })],
+      ["My child enjoys drawing, designing, storytelling, music or visual ideas.", fcWeights({ creative: 3, humanities: 1, emerging: 1 }, { creative: 3, communication: 1 })],
+      ["My child is comfortable with discipline, routine and physical effort.", fcWeights({ defence: 3, sports: 2, medical: 1 }, { resilience: 2, leadership: 1 })],
+      ["My child prefers observing carefully before answering.", fcWeights({ medical: 1, nonMedical: 1, humanities: 1, emerging: 1 }, { analytical: 2, logical: 1 })],
+      ["My child asks deep questions about how the world works.", fcWeights({ nonMedical: 2, medical: 1, emerging: 2, humanities: 1 }, { logical: 2, analytical: 2 })],
+    ],
+  },
+  {
+    title: "Academic Interest",
+    questions: [
+      ["Biology, the human body, plants, animals or health topics interest my child.", fcWeights({ medical: 3, agriculture: 1 }, { analytical: 1, empathy: 1 })],
+      ["Maths puzzles, formulas and numerical patterns interest my child.", fcWeights({ nonMedical: 3, commerce: 2, emerging: 1 }, { logical: 3, analytical: 2 })],
+      ["Physics, machines, electricity, space or engineering ideas interest my child.", fcWeights({ nonMedical: 3, aviation: 2, defence: 1 }, { logical: 2, practical: 1 })],
+      ["Computers, coding, AI, apps or digital tools interest my child.", fcWeights({ nonMedical: 2, emerging: 3, vocational: 1 }, { logical: 2, practical: 2 })],
+      ["Business, money, markets, brands or entrepreneurship interest my child.", fcWeights({ commerce: 3, vocational: 1, hospitality: 1 }, { analytical: 1, leadership: 1 })],
+      ["History, politics, society, law or current affairs interest my child.", fcWeights({ humanities: 3, defence: 1 }, { communication: 2, analytical: 1 })],
+      ["English, public speaking, writing or debating interest my child.", fcWeights({ humanities: 2, commerce: 1, creative: 2 }, { communication: 3, creative: 1 })],
+      ["Art, media, design, film, animation or content creation interest my child.", fcWeights({ creative: 3, humanities: 1, emerging: 1 }, { creative: 3 })],
+    ],
+  },
+  {
+    title: "Work Style",
+    questions: [
+      ["My child can work alone with focus for a long time.", fcWeights({ medical: 1, nonMedical: 2, commerce: 1, emerging: 1 }, { resilience: 1, analytical: 2 })],
+      ["My child enjoys working in teams.", fcWeights({ commerce: 1, defence: 1, sports: 2, hospitality: 2 }, { communication: 2, leadership: 1 })],
+      ["My child enjoys explaining things to others.", fcWeights({ humanities: 2, medical: 1, commerce: 1 }, { communication: 3, empathy: 1 })],
+      ["My child enjoys research, reading and collecting information.", fcWeights({ medical: 2, humanities: 2, emerging: 1 }, { analytical: 3 })],
+      ["My child enjoys selling ideas, convincing people or negotiating.", fcWeights({ commerce: 3, humanities: 1, hospitality: 1 }, { communication: 2, leadership: 1 })],
+      ["My child likes outdoor activity, movement and sports.", fcWeights({ sports: 3, defence: 2, agriculture: 1 }, { resilience: 2, practical: 1 })],
+      ["My child likes travelling, meeting people and real-world exposure.", fcWeights({ hospitality: 2, aviation: 2, commerce: 1, humanities: 1 }, { communication: 2 })],
+      ["My child prefers practical work over only theory.", fcWeights({ vocational: 3, agriculture: 1, hospitality: 1, aviation: 1 }, { practical: 3 })],
+    ],
+  },
+  {
+    title: "Thinking Style",
+    questions: [
+      ["My child thinks logically and likes clear right-or-wrong answers.", fcWeights({ nonMedical: 2, commerce: 1, defence: 1 }, { logical: 3 })],
+      ["My child connects ideas creatively and thinks differently.", fcWeights({ creative: 2, emerging: 2, humanities: 1 }, { creative: 3 })],
+      ["My child can compare options before deciding.", fcWeights({ commerce: 2, medical: 1, humanities: 1 }, { analytical: 3 })],
+      ["My child learns best by doing experiments or activities.", fcWeights({ nonMedical: 2, vocational: 2, agriculture: 1 }, { practical: 3 })],
+      ["My child notices small details that others miss.", fcWeights({ medical: 2, aviation: 1, commerce: 1 }, { analytical: 2, logical: 1 })],
+      ["My child is good at planning steps for a goal.", fcWeights({ commerce: 2, defence: 2, nonMedical: 1 }, { leadership: 1, analytical: 2 })],
+      ["My child understands people and emotions well.", fcWeights({ humanities: 2, medical: 1, hospitality: 1 }, { empathy: 3 })],
+      ["My child enjoys trying new technology before others.", fcWeights({ emerging: 3, nonMedical: 2, vocational: 1 }, { practical: 1, logical: 1 })],
+    ],
+  },
+  {
+    title: "Pressure & Discipline",
+    questions: [
+      ["My child can handle regular tests and competitive preparation.", fcWeights({ medical: 2, nonMedical: 1, commerce: 1, defence: 1 }, { resilience: 3 })],
+      ["My child remains calm when results are not perfect.", fcWeights({ medical: 1, commerce: 1, sports: 1, defence: 1 }, { resilience: 2 })],
+      ["My child can follow a daily study routine.", fcWeights({ medical: 2, nonMedical: 1, commerce: 1, defence: 1 }, { resilience: 2, analytical: 1 })],
+      ["My child can prepare for long-term goals without quick rewards.", fcWeights({ medical: 2, defence: 2, commerce: 1 }, { resilience: 3 })],
+      ["My child performs better through projects than high-pressure exams.", fcWeights({ creative: 2, vocational: 2, emerging: 1, humanities: 1 }, { practical: 2, creative: 1 })],
+      ["My child enjoys competition and challenge.", fcWeights({ defence: 2, sports: 2, commerce: 1, nonMedical: 1 }, { resilience: 2, leadership: 1 })],
+      ["My child needs emotional encouragement during pressure.", fcWeights({ humanities: 1, creative: 1, hospitality: 1 }, { empathy: 1 })],
+      ["My child has the patience for many years of study.", fcWeights({ medical: 3, humanities: 1, commerce: 1 }, { resilience: 3 })],
+    ],
+  },
+  {
+    title: "Motivation",
+    questions: [
+      ["My child wants a career that helps people directly.", fcWeights({ medical: 2, humanities: 2, hospitality: 1 }, { empathy: 3 })],
+      ["My child wants a career with innovation and future technology.", fcWeights({ emerging: 3, nonMedical: 2, aviation: 1 }, { logical: 1, creative: 1 })],
+      ["My child wants financial independence and business growth.", fcWeights({ commerce: 3, vocational: 1, hospitality: 1 }, { leadership: 1, analytical: 1 })],
+      ["My child wants respect, service and uniformed discipline.", fcWeights({ defence: 3, sports: 1 }, { resilience: 2, leadership: 1 })],
+      ["My child wants freedom to create original work.", fcWeights({ creative: 3, humanities: 1, emerging: 1 }, { creative: 3 })],
+      ["My child wants a stable government or public-service path.", fcWeights({ humanities: 2, defence: 2, commerce: 1 }, { resilience: 1, communication: 1 })],
+      ["My child wants to work with nature, food, environment or sustainability.", fcWeights({ agriculture: 3, medical: 1, emerging: 1 }, { practical: 1, analytical: 1 })],
+      ["My child wants a career with travel, aviation, hotels or global exposure.", fcWeights({ hospitality: 3, aviation: 3, commerce: 1 }, { communication: 2 })],
+    ],
+  },
+  {
+    title: "Career Curiosity",
+    questions: [
+      ["Doctor, dentist, physiotherapist, psychologist or health careers excite my child.", fcWeights({ medical: 3 }, { empathy: 1, analytical: 1 })],
+      ["Engineering, robotics, AI, software or machines excite my child.", fcWeights({ nonMedical: 3, emerging: 2 }, { logical: 2, practical: 1 })],
+      ["CA, finance, business, stock market or entrepreneurship excite my child.", fcWeights({ commerce: 3 }, { analytical: 2, leadership: 1 })],
+      ["Law, civil services, journalism, psychology or public policy excite my child.", fcWeights({ humanities: 3 }, { communication: 2, analytical: 1 })],
+      ["Army, Navy, Air Force, police or national service excite my child.", fcWeights({ defence: 3 }, { resilience: 2, leadership: 1 })],
+      ["Professional sports, coaching, fitness or sports science excite my child.", fcWeights({ sports: 3 }, { resilience: 2, practical: 1 })],
+      ["Design, film, animation, gaming, writing or content creation excite my child.", fcWeights({ creative: 3, emerging: 1 }, { creative: 3 })],
+      ["Pilot, airport management, drone pilot or aerospace careers excite my child.", fcWeights({ aviation: 3, nonMedical: 1 }, { practical: 1, resilience: 1 })],
+    ],
+  },
+  {
+    title: "Future Readiness",
+    questions: [
+      ["My child is curious about how AI will change careers.", fcWeights({ emerging: 3, nonMedical: 1, commerce: 1 }, { analytical: 1, logical: 1 })],
+      ["My child can communicate ideas clearly in speech or writing.", fcWeights({ humanities: 2, commerce: 1, hospitality: 1, creative: 1 }, { communication: 3 })],
+      ["My child can learn from videos, apps or online tools responsibly.", fcWeights({ emerging: 2, nonMedical: 1, vocational: 1 }, { practical: 1, analytical: 1 })],
+      ["My child likes solving real-life problems, not only textbook questions.", fcWeights({ emerging: 2, vocational: 2, nonMedical: 1, commerce: 1 }, { practical: 2, creative: 1 })],
+      ["My child is open to careers that may not be common in our area yet.", fcWeights({ emerging: 3, creative: 1, aviation: 1 }, { creative: 1, resilience: 1 })],
+      ["My child can balance marks, skills and personality development.", fcWeights({ commerce: 1, humanities: 1, emerging: 1, medical: 1 }, { resilience: 1, communication: 1 })],
+      ["My child needs early exposure before making a final stream decision.", fcWeights({ vocational: 1, emerging: 1, creative: 1 }, { practical: 1 })],
+      ["My child would benefit from mentoring before Grade 10 subject choices.", fcWeights({ medical: 1, nonMedical: 1, commerce: 1, humanities: 1 }, { analytical: 1, communication: 1 })],
+    ],
+  },
+];
+
+let latestFutureCompass = null;
+
+function renderFutureCompassQuestions() {
+  if (!futureCompassQuestions) return;
+  futureCompassQuestions.innerHTML = futureCompassQuestionSections
+    .map((section, sectionIndex) => {
+      const questions = section.questions
+        .map(([prompt], questionIndex) => {
+          const globalIndex = sectionIndex * 8 + questionIndex + 1;
+          const name = `fcQ${globalIndex}`;
+          const options = futureCompassOptionFactors
+            .map(([label, factor]) => `<label><input type="radio" name="${name}" value="${factor}" required />${label}</label>`)
+            .join("");
+          return `<div class="future-compass-question" data-fc-question="${name}"><p>${globalIndex}. ${prompt}</p><div class="future-compass-options">${options}</div></div>`;
+        })
+        .join("");
+      return `<section class="future-compass-group"><h3>${section.title}</h3>${questions}</section>`;
+    })
+    .join("");
+}
+
+function updateFutureCompassProgress() {
+  if (!futureCompassForm || !futureCompassProgress) return;
+  const profileFields = ["fcParentName", "fcStudentName", "fcMobile", "fcEmail", "fcGrade", "fcCity", "fcChildPreference", "fcParentPreference"];
+  const questionCount = futureCompassQuestionSections.reduce((count, section) => count + section.questions.length, 0);
+  const completedProfile = profileFields.filter((name) => String(futureCompassForm.elements[name]?.value || "").trim()).length;
+  const completedQuestions = Array.from({ length: questionCount }, (_, index) => futureCompassForm.querySelector(`input[name="fcQ${index + 1}"]:checked`)).filter(Boolean).length;
+  const total = profileFields.length + questionCount;
+  futureCompassProgress.style.width = `${Math.round((completedProfile + completedQuestions) / total * 100)}%`;
+}
+
+function showFutureCompassError(message) {
+  if (!futureCompassError) return;
+  futureCompassError.textContent = message;
+  futureCompassError.hidden = false;
+  futureCompassError.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function clearFutureCompassError() {
+  if (!futureCompassError) return;
+  futureCompassError.textContent = "";
+  futureCompassError.hidden = true;
+}
+
+function validateFutureCompass() {
+  if (!futureCompassForm) return false;
+  futureCompassForm.querySelectorAll(".is-invalid").forEach((element) => element.classList.remove("is-invalid"));
+  const missing = [];
+  let firstMissing = null;
+  [
+    ["fcParentName", "parent name"],
+    ["fcStudentName", "student name"],
+    ["fcMobile", "mobile number"],
+    ["fcEmail", "email"],
+    ["fcGrade", "current grade"],
+    ["fcCity", "city"],
+    ["fcChildPreference", "child preference"],
+    ["fcParentPreference", "parent preference"],
+  ].forEach(([name, label]) => {
+    const field = futureCompassForm.elements[name];
+    if (!String(field?.value || "").trim()) {
+      missing.push(label);
+      field?.closest("label")?.classList.add("is-invalid");
+      firstMissing ||= field;
+    }
+  });
+  const mobile = String(futureCompassForm.elements.fcMobile?.value || "").replace(/\D/g, "");
+  const email = String(futureCompassForm.elements.fcEmail?.value || "").trim();
+  if (mobile && mobile.length < 10) missing.push("valid 10-digit mobile number");
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) missing.push("valid email");
+
+  const questionCount = futureCompassQuestionSections.reduce((count, section) => count + section.questions.length, 0);
+  for (let index = 1; index <= questionCount; index += 1) {
+    const selected = futureCompassForm.querySelector(`input[name="fcQ${index}"]:checked`);
+    if (!selected) {
+      missing.push(`question ${index}`);
+      const question = futureCompassForm.querySelector(`[data-fc-question="fcQ${index}"]`);
+      question?.classList.add("is-invalid");
+      firstMissing ||= question?.querySelector("input");
+    }
+  }
+
+  if (missing.length) {
+    showFutureCompassError(`Please complete the Future Compass assessment before generating the report. Missing: ${missing.slice(0, 12).join(", ")}${missing.length > 12 ? "..." : ""}.`);
+    firstMissing?.focus({ preventScroll: true });
+    return false;
+  }
+  clearFutureCompassError();
+  return true;
+}
+
+function preferenceToStream(value) {
+  const text = String(value || "").toLowerCase();
+  if (text.includes("medical") || text.includes("doctor")) return "medical";
+  if (text.includes("non-medical") || text.includes("engineer")) return "nonMedical";
+  if (text.includes("commerce") || text.includes("business")) return "commerce";
+  if (text.includes("humanities") || text.includes("government") || text.includes("upsc")) return "humanities";
+  if (text.includes("defence")) return "defence";
+  if (text.includes("creative")) return "creative";
+  if (text.includes("sports")) return "sports";
+  if (text.includes("skill")) return "vocational";
+  return "";
+}
+
+const futureCompassStreamTraitFit = {
+  medical: ["empathy", "analytical", "resilience"],
+  nonMedical: ["logical", "practical", "analytical"],
+  commerce: ["analytical", "leadership", "communication"],
+  humanities: ["communication", "empathy", "analytical"],
+  defence: ["resilience", "leadership", "practical"],
+  creative: ["creative", "communication", "practical"],
+  sports: ["resilience", "practical", "leadership"],
+  vocational: ["practical", "logical", "creative"],
+  agriculture: ["practical", "analytical", "empathy"],
+  hospitality: ["communication", "empathy", "leadership"],
+  aviation: ["practical", "resilience", "logical"],
+  emerging: ["logical", "creative", "analytical"],
+};
+
+const futureCompassStreamSignals = {
+  medical: "health, biology, patience, careful observation, and service-oriented thinking",
+  nonMedical: "maths, machines, technology, experiments, and structured problem solving",
+  commerce: "business, money, planning, negotiation, and decision-making",
+  humanities: "communication, society, law, public service, writing, and people understanding",
+  defence: "discipline, physical effort, service, leadership, and pressure handling",
+  creative: "design, storytelling, media, originality, and expressive confidence",
+  sports: "movement, competition, stamina, coaching, and performance discipline",
+  vocational: "hands-on learning, practical work, digital skills, and early skill-building",
+  agriculture: "nature, sustainability, food systems, practical field learning, and observation",
+  hospitality: "travel, service, people-facing confidence, and global exposure",
+  aviation: "flight, aerospace, precision, safety, travel, and technical discipline",
+  emerging: "AI, future technology, real-world problem solving, and new-age careers",
+};
+
+const futureCompassTraitNotes = {
+  logical: "logical thinking",
+  creative: "creative imagination",
+  analytical: "careful analysis",
+  practical: "hands-on learning",
+  communication: "communication confidence",
+  resilience: "pressure readiness",
+  empathy: "people understanding",
+  leadership: "leadership",
+};
+
+function normalizeCompassScore(raw, max, base = 34, range = 60) {
+  if (!max) return base;
+  const ratio = Math.max(0, Math.min(1, raw / max));
+  return Math.max(24, Math.min(96, Math.round(base + ratio * range)));
+}
+
+function topFutureCompassTraits(traitScores, limit = 3) {
+  return Object.entries(traitScores).sort((a, b) => b[1] - a[1]).slice(0, limit);
+}
+
+function buildFutureCompassCareers(rankedStreams, traitScores, childStream, parentStream) {
+  const candidates = [];
+  rankedStreams.slice(0, 5).forEach(([stream, streamScore], streamRank) => {
+    const desiredTraits = futureCompassStreamTraitFit[stream] || [];
+    const traitAverage = desiredTraits.length
+      ? desiredTraits.reduce((sum, key) => sum + (traitScores[key] || 0), 0) / desiredTraits.length
+      : 55;
+    (futureCompassCareers[stream] || []).forEach((name, careerIndex) => {
+      const preferenceBoost = (stream === childStream ? 5 : 0) + (stream === parentStream ? 3 : 0);
+      const score = Math.round(streamScore * 0.58 + traitAverage * 0.3 + preferenceBoost + Math.max(0, 8 - streamRank * 2) - careerIndex * 0.16);
+      const strongestTrait = desiredTraits
+        .map((key) => [key, traitScores[key] || 0])
+        .sort((a, b) => b[1] - a[1])[0]?.[0];
+      candidates.push({
+        name,
+        stream,
+        score: Math.max(38, Math.min(96, score)),
+        reason: `Connects with ${futureCompassStreams[stream]} signals and ${futureCompassTraitNotes[strongestTrait] || "overall aptitude"} shown in the answers.`,
+      });
+    });
+  });
+
+  const seen = new Set();
+  return candidates
+    .sort((a, b) => b.score - a.score)
+    .filter((career) => {
+      const key = career.name.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 20);
+}
+
+function buildFutureCompassMyths(report) {
+  const top = report.topStream;
+  const childStream = preferenceToStream(report.childPreference);
+  const parentStream = preferenceToStream(report.parentPreference);
+  const myths = [
+    ["Only Science students become successful.", "False. Success depends on fit, skill, discipline, exposure and adaptability."],
+    ["Commerce is for weak students.", "False. Commerce can lead to CA, finance, business, analytics, entrepreneurship and FinTech."],
+    ["Arts has no scope.", "False. Humanities can lead to law, civil services, psychology, media, policy, design and international relations."],
+    ["AI will replace all jobs.", "Not exactly. AI changes routine work, but students who can think, communicate and use tools well become stronger."],
+  ];
+  if (top === "creative") myths.unshift(["Creative careers are only hobbies.", "False. Design, media, gaming, content, branding and product work can become serious career paths with a strong portfolio."]);
+  if (top === "sports") myths.unshift(["Sports means only becoming a player.", "False. Coaching, sports science, analytics, physiotherapy, fitness and sports management are also strong directions."]);
+  if (top === "vocational") myths.unshift(["Skill-based careers are second choice.", "False. Practical digital and technical skills can create early earning, entrepreneurship and strong career mobility."]);
+  if (top === "emerging") myths.unshift(["New-age careers are too risky.", "Partly true only without foundation. With maths, communication, projects and mentoring, emerging careers can become powerful options."]);
+  if (childStream && parentStream && childStream !== parentStream) myths.unshift(["Parent and child preference must match immediately.", "False. A temporary difference is useful because it opens a better family discussion before Grade 10 pressure begins."]);
+  return myths.slice(0, 4);
+}
+
+function buildFutureCompassSfisHelp(report) {
+  const top = report.topStream;
+  const strongestTraits = topFutureCompassTraits(report.traitScores, 2).map(([key]) => key);
+  const help = [
+    "Career awareness from middle school so stream selection does not become a last-minute panic decision.",
+    "Parent-student counselling conversations before major academic decisions.",
+  ];
+  if (["nonMedical", "emerging", "aviation"].includes(top)) {
+    help.push("Robotics, computer lab exposure and project work to test technology and engineering interest early.");
+  }
+  if (top === "medical") {
+    help.push("Science observation, biology curiosity and disciplined study routines to prepare for health-related paths.");
+  }
+  if (["commerce", "humanities", "hospitality"].includes(top) || strongestTraits.includes("communication")) {
+    help.push("Communication, presentation, debate and leadership opportunities to build confidence across people-facing careers.");
+  }
+  if (["defence", "sports"].includes(top) || strongestTraits.includes("resilience")) {
+    help.push("Sports, fitness, discipline and responsibility-building routines for pressure readiness.");
+  }
+  if (["creative", "vocational", "agriculture"].includes(top) || strongestTraits.includes("creative") || strongestTraits.includes("practical")) {
+    help.push("Project-based learning and hands-on showcases so students can build proof of skill, not only marks.");
+  }
+  help.push("Competitive exam foundation, reasoning practice and mentor exposure inside school life.");
+  return [...new Set(help)].slice(0, 5);
+}
+
+function calculateFutureCompass(data) {
+  const streamRaw = Object.fromEntries(Object.keys(futureCompassStreams).map((key) => [key, 0]));
+  const streamMax = Object.fromEntries(Object.keys(futureCompassStreams).map((key) => [key, 0]));
+  const traitRaw = Object.fromEntries(Object.keys(futureCompassTraits).map((key) => [key, 0]));
+  const traitMax = Object.fromEntries(Object.keys(futureCompassTraits).map((key) => [key, 0]));
+  const streamEvidence = Object.fromEntries(Object.keys(futureCompassStreams).map((key) => [key, []]));
+  let questionIndex = 1;
+  futureCompassQuestionSections.forEach((section) => {
+    section.questions.forEach(([prompt, config]) => {
+      const factor = Number(data.get(`fcQ${questionIndex}`) || 0);
+      Object.entries(config.streams).forEach(([key, weight]) => {
+        streamRaw[key] += weight * factor;
+        streamMax[key] += weight;
+        if (factor >= 0.68 && streamEvidence[key].length < 4) {
+          streamEvidence[key].push(prompt);
+        }
+      });
+      Object.entries(config.traits).forEach(([key, weight]) => {
+        traitRaw[key] += weight * factor;
+        traitMax[key] += weight;
+      });
+      questionIndex += 1;
+    });
+  });
+
+  const childStream = preferenceToStream(data.get("fcChildPreference"));
+  const parentStream = preferenceToStream(data.get("fcParentPreference"));
+  if (childStream) {
+    streamRaw[childStream] += 1.6;
+    streamMax[childStream] += 1.6;
+  }
+  if (parentStream) {
+    streamRaw[parentStream] += 0.85;
+    streamMax[parentStream] += 0.85;
+  }
+
+  const finalStreamScores = Object.fromEntries(
+    Object.keys(futureCompassStreams).map((key) => [
+      key,
+      normalizeCompassScore(streamRaw[key], streamMax[key], 31, 62),
+    ])
+  );
+  const finalTraitScores = Object.fromEntries(
+    Object.keys(futureCompassTraits).map((key) => [
+      key,
+      normalizeCompassScore(traitRaw[key], traitMax[key], 33, 60),
+    ])
+  );
+  const rankedStreams = Object.entries(finalStreamScores).sort((a, b) => b[1] - a[1] || (streamRaw[b[0]] - streamRaw[a[0]]));
+  const topStream = rankedStreams[0][0];
+  const topCareers = buildFutureCompassCareers(rankedStreams, finalTraitScores, childStream, parentStream);
+  const topTraits = topFutureCompassTraits(finalTraitScores, 3);
+  const aligned = childStream && parentStream && childStream === parentStream;
+  const noFixedParent = String(data.get("fcParentPreference") || "").toLowerCase().includes("no fixed");
+  const alignment = aligned
+    ? `Child and parent preferences both point toward ${futureCompassStreams[childStream]}. This is a strong starting point, but the final choice should still consider marks, aptitude, pressure readiness, and real exposure.`
+    : noFixedParent
+      ? "Parent preference is open, which is helpful. Use this report to observe the child for 3-6 months before narrowing streams."
+      : `Child preference is ${data.get("fcChildPreference")}, while parent preference is ${data.get("fcParentPreference")}. This does not mean conflict. It means the family should compare interest, capability, and long-term fit calmly before deciding.`;
+  const why = [
+    `${futureCompassStreams[topStream]} scored highest because the answers showed stronger signals around ${futureCompassStreamSignals[topStream]}.`,
+    `The strongest learning signals are ${topTraits.map(([key, value]) => `${futureCompassTraits[key]} (${value}%)`).join(", ")}.`,
+    streamEvidence[topStream][0] ? `One repeated pattern was: ${streamEvidence[topStream][0]}` : "The result is based on interest, aptitude, work style, motivation, and future-readiness patterns together.",
+  ];
+  if (rankedStreams[0][1] - rankedStreams[1][1] <= 5) {
+    why.push(`${futureCompassStreams[rankedStreams[1][0]]} is very close, so the next 3-6 months of projects and subject exposure should be observed carefully.`);
+  }
+  if (childStream && childStream === topStream) {
+    why.push("The child's current preference is supported by the assessment pattern, which is a useful confidence signal.");
+  }
+
+  const watchAreas = [];
+  if ((finalTraitScores.resilience || 0) < 62) watchAreas.push("Build pressure readiness slowly before choosing paths with long competitive preparation.");
+  if ((finalTraitScores.communication || 0) < 62) watchAreas.push("Add speaking, writing and presentation practice because every stream now needs communication.");
+  if (["medical", "nonMedical", "commerce"].includes(topStream) && (finalTraitScores.analytical || 0) < 64) {
+    watchAreas.push("Strengthen reasoning and analysis before making an exam-heavy stream decision.");
+  }
+  if (childStream && parentStream && childStream !== parentStream) {
+    watchAreas.push("Child and parent preferences differ, so avoid a quick decision; compare marks, interest, stress handling and exposure calmly.");
+  }
+  if (rankedStreams[0][1] < 66) watchAreas.push("The top score is still developing, so more exploration is recommended before narrowing the path.");
+  while (watchAreas.length < 4) {
+    const next = [
+      "Use real exposure such as projects, reading, mentor talks and school activities before finalizing the stream.",
+      "Do not treat this as a permanent label; interests can mature strongly between Grade 8 and Grade 10.",
+      "Compare the report with classroom performance, teacher feedback and the student's own excitement.",
+      "Keep marks, skills, personality and emotional readiness in the same conversation.",
+    ].find((item) => !watchAreas.includes(item));
+    if (!next) break;
+    watchAreas.push(next);
+  }
+
+  return {
+    parentName: String(data.get("fcParentName") || "").trim(),
+    studentName: String(data.get("fcStudentName") || "").trim(),
+    mobile: String(data.get("fcMobile") || "").trim(),
+    email: String(data.get("fcEmail") || "").trim(),
+    grade: String(data.get("fcGrade") || "").trim(),
+    city: String(data.get("fcCity") || "").trim(),
+    childPreference: String(data.get("fcChildPreference") || "").trim(),
+    parentPreference: String(data.get("fcParentPreference") || "").trim(),
+    streamScores: finalStreamScores,
+    traitScores: finalTraitScores,
+    rankedStreams,
+    topStream,
+    topCareers,
+    why: why.slice(0, 5),
+    watchAreas: watchAreas.slice(0, 4),
+    alignment,
+    alignmentTips: [
+      "Do not choose a stream only because marks are high today.",
+      "Give the student real exposure: labs, projects, reading, counselling, internships or mentor conversations.",
+      "Revisit this decision after observing consistency, stress handling, and genuine curiosity.",
+    ],
+  };
+}
+
+function renderFutureCompassReport() {
+  if (!latestFutureCompass || !futureCompassReport) return;
+  const topLabel = futureCompassStreams[latestFutureCompass.topStream];
+  futureCompassReport.querySelector('[data-fc-report="headline"]').textContent = `${latestFutureCompass.studentName}'s Future Compass`;
+  futureCompassReport.querySelector('[data-fc-report="summary"]').textContent = `For ${latestFutureCompass.grade}, ${topLabel} is currently the strongest fit signal, followed by ${futureCompassStreams[latestFutureCompass.rankedStreams[1][0]]} and ${futureCompassStreams[latestFutureCompass.rankedStreams[2][0]]}. This is guidance for discussion, not a fixed career prediction.`;
+  futureCompassReport.querySelector('[data-fc-report="topScore"]').textContent = `${latestFutureCompass.rankedStreams[0][1]}%`;
+  futureCompassReport.querySelector('[data-fc-report="topStream"]').textContent = topLabel;
+  futureCompassReport.querySelector('[data-fc-report="streamScores"]').innerHTML = latestFutureCompass.rankedStreams
+    .map(([key, value]) => `<div class="score-row"><div><span>${futureCompassStreams[key]}</span><strong>${value}%</strong></div><div class="score-track"><span style="--score:${value}%"></span></div></div>`)
+    .join("");
+  futureCompassReport.querySelector('[data-fc-report="traitScores"]').innerHTML = Object.entries(latestFutureCompass.traitScores)
+    .sort((a, b) => b[1] - a[1])
+    .map(([key, value]) => `<div class="score-row"><div><span>${futureCompassTraits[key]}</span><strong>${value}%</strong></div><div class="score-track"><span style="--score:${value}%"></span></div></div>`)
+    .join("");
+  futureCompassReport.querySelector('[data-fc-report="topCareers"]').innerHTML = latestFutureCompass.topCareers
+    .map((career) => `<li><strong>${career.name}</strong><span>${career.score}% fit signal</span><p>${career.reason}</p></li>`)
+    .join("");
+  futureCompassReport.querySelector('[data-fc-report="alignment"]').textContent = latestFutureCompass.alignment;
+  futureCompassReport.querySelector('[data-fc-report="alignmentTips"]').innerHTML = latestFutureCompass.alignmentTips.map((tip) => `<li>${tip}</li>`).join("");
+  const whyList = futureCompassReport.querySelector('[data-fc-report="why"]');
+  if (whyList) whyList.innerHTML = latestFutureCompass.why.map((item) => `<li>${item}</li>`).join("");
+  const watchList = futureCompassReport.querySelector('[data-fc-report="watch"]');
+  if (watchList) watchList.innerHTML = latestFutureCompass.watchAreas.map((item) => `<li>${item}</li>`).join("");
+  futureCompassReport.querySelector('[data-fc-report="myths"]').innerHTML = buildFutureCompassMyths(latestFutureCompass)
+    .map(([myth, answer]) => `<article><strong>${myth}</strong><p>${answer}</p></article>`)
+    .join("");
+  futureCompassReport.querySelector('[data-fc-report="salaryExplorer"]').innerHTML = latestFutureCompass.rankedStreams.slice(0, 4).map(([key]) => {
+    const item = futureCompassDemand[key];
+    return `<article><strong>${futureCompassStreams[key]}</strong><p>${item.salary}</p><span>${item.demand} demand</span><span>${item.balance}</span><p>${item.ai}</p></article>`;
+  }).join("");
+  futureCompassReport.querySelector('[data-fc-report="sfisHelp"]').innerHTML = buildFutureCompassSfisHelp(latestFutureCompass).map((item) => `<li>${item}</li>`).join("");
+  futureCompassReport.hidden = false;
+  futureCompassReport.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function buildFutureCompassPdfLines() {
+  if (!latestFutureCompass) return ["Please generate the Future Compass report first."];
+  return [
+    "SFIS Future Compass AI Report",
+    "Stone Field International School",
+    `Generated: ${new Date().toLocaleDateString()}`,
+    "",
+    "Student Profile",
+    `Parent: ${latestFutureCompass.parentName}`,
+    `Student: ${latestFutureCompass.studentName}`,
+    `Grade: ${latestFutureCompass.grade}`,
+    `City: ${latestFutureCompass.city}`,
+    `Mobile: ${latestFutureCompass.mobile}`,
+    `Email: ${latestFutureCompass.email}`,
+    `Child Preference: ${latestFutureCompass.childPreference}`,
+    `Parent Preference: ${latestFutureCompass.parentPreference}`,
+    "",
+    "Stream Fit Score",
+    ...latestFutureCompass.rankedStreams.map(([key, value]) => `- ${futureCompassStreams[key]}: ${value}%`),
+    "",
+    "Why This Result Appeared",
+    ...latestFutureCompass.why.map((item) => `- ${item}`),
+    "",
+    "Top Career Directions",
+    ...latestFutureCompass.topCareers.map((career, index) => `${index + 1}. ${career.name} (${career.score}%): ${career.reason}`),
+    "",
+    "Thinking and Learning Signals",
+    ...Object.entries(latestFutureCompass.traitScores).sort((a, b) => b[1] - a[1]).map(([key, value]) => `- ${futureCompassTraits[key]}: ${value}%`),
+    "",
+    "What Parents Should Watch",
+    ...latestFutureCompass.watchAreas.map((item) => `- ${item}`),
+    "",
+    "Parent vs Child Alignment",
+    latestFutureCompass.alignment,
+    ...latestFutureCompass.alignmentTips.map((tip) => `- ${tip}`),
+    "",
+    "AI Myth Buster",
+    ...buildFutureCompassMyths(latestFutureCompass).map(([myth, answer]) => `- ${myth} ${answer}`),
+    "",
+    "How SFIS Can Help",
+    ...buildFutureCompassSfisHelp(latestFutureCompass).map((item) => `- ${item}`),
+  ].flatMap((line) => (line ? wrapPdfLine(line) : [""]));
+}
+
+function createStyledFutureCompassPdfBlob() {
+  if (!latestFutureCompass) return createPdfBlob(["Please generate the Future Compass report first."]);
+  const objects = [];
+  const addObject = (content) => {
+    objects.push(content);
+    return objects.length;
+  };
+  const pageStreams = [];
+  let stream = [];
+  let y = 700;
+
+  const colors = {
+    night: [0.027, 0.067, 0.059],
+    panel: [0.95, 0.965, 0.93],
+    teal: [0.165, 0.86, 0.705],
+    gold: [0.94, 0.74, 0.31],
+    blue: [0.33, 0.68, 0.91],
+    coral: [1, 0.455, 0.36],
+    ink: [0.075, 0.125, 0.11],
+    muted: [0.32, 0.39, 0.36],
+    line: [0.82, 0.86, 0.8],
+    white: [1, 1, 1],
+  };
+
+  const color = ([r, g, b]) => `${r} ${g} ${b}`;
+  const rect = (x, ry, width, height, fill, stroke = null) => {
+    stream.push("q");
+    if (fill) stream.push(`${color(fill)} rg`);
+    if (stroke) stream.push(`${color(stroke)} RG`);
+    stream.push(`${x} ${ry} ${width} ${height} re ${stroke ? "B" : "f"}`);
+    stream.push("Q");
+  };
+  const text = (value, x, ty, size = 10, font = "F1", fill = colors.ink) => {
+    stream.push("BT");
+    stream.push(`/${font} ${size} Tf`);
+    stream.push(`${color(fill)} rg`);
+    stream.push(`${x} ${ty} Td`);
+    stream.push(`(${pdfSafeText(value)}) Tj`);
+    stream.push("ET");
+  };
+  const wrappedText = (value, x, startY, width, size = 10, font = "F1", fill = colors.ink, leading = 13) => {
+    const lines = wrapPdfLine(value, Math.max(24, Math.floor(width / (size * 0.52))));
+    lines.forEach((line, index) => text(line, x, startY - index * leading, size, font, fill));
+    return lines.length * leading;
+  };
+  const finishPage = () => {
+    if (stream.length) pageStreams.push(stream.join("\n"));
+    stream = [];
+  };
+  const startPage = () => {
+    finishPage();
+    rect(0, 0, 612, 792, colors.panel);
+    rect(0, 728, 612, 64, colors.night);
+    rect(0, 728, 612, 5, colors.teal);
+    text("SFIS Future Compass AI", 42, 759, 20, "F2", colors.gold);
+    text("Stone Field International School | Grade 8 onward guidance", 42, 741, 9.5, "F1", colors.white);
+    text(`Student: ${latestFutureCompass.studentName || "Student"}`, 382, 759, 9.5, "F2", colors.white);
+    text(`Generated: ${new Date().toLocaleDateString()}`, 382, 742, 8.5, "F1", colors.white);
+    y = 700;
+  };
+  const ensure = (height) => {
+    if (y - height < 48) startPage();
+  };
+  const pill = (label, x, py, fill = colors.teal, width = null) => {
+    const pillWidth = width || Math.max(54, Math.min(165, label.length * 5.3 + 18));
+    rect(x, py - 14, pillWidth, 20, fill);
+    text(label, x + 8, py - 8, 7.7, "F2", fill === colors.gold ? colors.night : colors.night);
+    return pillWidth;
+  };
+  const sectionCard = (title, lines, accent = colors.teal) => {
+    const wrapped = lines.flatMap((line) => wrapPdfLine(line, 84));
+    const height = 46 + wrapped.length * 14;
+    ensure(height);
+    rect(36, y - height, 540, height, colors.white, colors.line);
+    rect(36, y - height, 7, height, accent);
+    text(title, 54, y - 25, 14, "F2", colors.ink);
+    wrapped.forEach((line, index) => text(line, 54, y - 47 - index * 14, 9.4, "F1", colors.muted));
+    y -= height + 16;
+  };
+  const scoreBars = (title, entries, accent = colors.teal, limit = entries.length) => {
+    const shown = entries.slice(0, limit);
+    const height = 54 + shown.length * 29;
+    ensure(height);
+    rect(36, y - height, 540, height, colors.white, colors.line);
+    rect(36, y - height, 7, height, accent);
+    text(title, 54, y - 25, 14, "F2", colors.ink);
+    shown.forEach(([label, value], index) => {
+      const rowY = y - 52 - index * 29;
+      text(label, 54, rowY, 8.8, "F2", colors.ink);
+      text(`${value}%`, 510, rowY, 8.8, "F2", colors.ink);
+      rect(54, rowY - 15, 445, 8, [0.88, 0.9, 0.86]);
+      rect(54, rowY - 15, Math.round(445 * value / 100), 8, index % 3 === 0 ? colors.teal : index % 3 === 1 ? colors.gold : colors.blue);
+    });
+    y -= height + 16;
+  };
+  const miniCards = (title, cards) => {
+    const rows = Math.ceil(cards.length / 2);
+    const height = 50 + rows * 84;
+    ensure(height);
+    rect(36, y - height, 540, height, colors.white, colors.line);
+    rect(36, y - height, 7, height, colors.blue);
+    text(title, 54, y - 25, 14, "F2", colors.ink);
+    cards.forEach((card, index) => {
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      const x = 54 + col * 260;
+      const cy = y - 48 - row * 84;
+      rect(x, cy - 62, 244, 66, [0.94, 0.965, 0.94], colors.line);
+      text(card.title, x + 10, cy - 16, 9.5, "F2", colors.ink);
+      wrappedText(card.body, x + 10, cy - 32, 218, 7.8, "F1", colors.muted, 10);
+    });
+    y -= height + 16;
+  };
+
+  startPage();
+
+  const topLabel = futureCompassStreams[latestFutureCompass.topStream];
+  const secondLabel = futureCompassStreams[latestFutureCompass.rankedStreams[1][0]];
+  const thirdLabel = futureCompassStreams[latestFutureCompass.rankedStreams[2][0]];
+
+  rect(36, 506, 540, 194, colors.night);
+  text("Personalized Future Path Report", 54, 666, 11, "F2", colors.teal);
+  wrappedText(`${latestFutureCompass.studentName}'s strongest current fit signal is ${topLabel}.`, 54, 632, 330, 23, "F2", colors.gold, 26);
+  wrappedText(`Followed by ${secondLabel} and ${thirdLabel}. This is guidance for family discussion, not a fixed prediction.`, 54, 558, 310, 10.5, "F1", colors.white, 14);
+  rect(428, 556, 104, 104, [0.12, 0.24, 0.2], colors.teal);
+  text("TOP STREAM", 446, 626, 7.8, "F2", colors.white);
+  text(`${latestFutureCompass.rankedStreams[0][1]}%`, 446, 600, 25, "F2", colors.gold);
+  wrappedText(topLabel, 446, 578, 76, 8.2, "F2", colors.white, 10);
+  y = 482;
+
+  sectionCard("Student Profile", [
+    `Parent: ${latestFutureCompass.parentName}`,
+    `Student: ${latestFutureCompass.studentName} | ${latestFutureCompass.grade} | ${latestFutureCompass.city}`,
+    `Mobile: ${latestFutureCompass.mobile} | Email: ${latestFutureCompass.email}`,
+    `Child Preference: ${latestFutureCompass.childPreference}`,
+    `Parent Preference: ${latestFutureCompass.parentPreference}`,
+  ], colors.gold);
+
+  scoreBars(
+    "Stream Fit Score",
+    latestFutureCompass.rankedStreams.map(([key, value]) => [futureCompassStreams[key], value]),
+    colors.teal,
+    latestFutureCompass.rankedStreams.length
+  );
+
+  sectionCard("Why This Result Appeared", latestFutureCompass.why.map((item) => `• ${item}`), colors.blue);
+
+  scoreBars(
+    "Thinking & Learning Signals",
+    Object.entries(latestFutureCompass.traitScores).sort((a, b) => b[1] - a[1]).map(([key, value]) => [futureCompassTraits[key], value]),
+    colors.gold
+  );
+
+  sectionCard("What Parents Should Watch", latestFutureCompass.watchAreas.map((item) => `• ${item}`), colors.coral);
+
+  sectionCard("Parent vs Child Alignment", [
+    latestFutureCompass.alignment,
+    ...latestFutureCompass.alignmentTips.map((tip) => `• ${tip}`),
+  ], colors.blue);
+
+  startPage();
+  const topCareers = latestFutureCompass.topCareers.slice(0, 20);
+  const careerHeight = 250;
+  rect(36, y - careerHeight, 540, careerHeight, colors.white, colors.line);
+  rect(36, y - careerHeight, 7, careerHeight, colors.gold);
+  text("Top 20 Career Directions", 54, y - 25, 15, "F2", colors.ink);
+  topCareers.forEach((career, index) => {
+    const col = Math.floor(index / 10);
+    const row = index % 10;
+    const x = 54 + col * 256;
+    const rowY = y - 52 - row * 18;
+    text(`${index + 1}.`, x, rowY, 8.7, "F2", colors.teal);
+    text(`${career.name} (${career.score}%)`, x + 22, rowY, 8.7, "F1", colors.ink);
+  });
+  y -= careerHeight + 18;
+
+  sectionCard("Career Interpretation", topCareers.slice(0, 5).map((career) => `• ${career.name}: ${career.reason}`), colors.gold);
+
+  miniCards("AI Myth Buster", buildFutureCompassMyths(latestFutureCompass).map(([title, body]) => ({ title, body })));
+
+  miniCards("Salary & Future Demand Explorer", latestFutureCompass.rankedStreams.slice(0, 4).map(([key]) => {
+    const item = futureCompassDemand[key];
+    return {
+      title: futureCompassStreams[key],
+      body: `${item.salary}. Demand: ${item.demand}. AI impact: ${item.ai}`,
+    };
+  }));
+
+  sectionCard("How SFIS Can Help From Grade 8 Onward", buildFutureCompassSfisHelp(latestFutureCompass).map((item) => `• ${item}`), colors.teal);
+
+  ensure(76);
+  rect(36, y - 70, 540, 70, colors.night);
+  text("Important note", 54, y - 24, 11, "F2", colors.gold);
+  wrappedText("This AI-assisted report is for parent-student discussion. It does not replace a professional counsellor, board eligibility rules, entrance requirements, or the student's evolving interests.", 54, y - 42, 486, 8.5, "F1", colors.white, 11);
+  y -= 86;
+  finishPage();
+
+  addObject("<< /Type /Catalog /Pages 2 0 R >>");
+  addObject("");
+  addObject("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+  addObject("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
+
+  const pageIds = [];
+  pageStreams.forEach((pageStream) => {
+    const contentId = objects.length + 2;
+    const pageId = addObject(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentId} 0 R >>`);
+    addObject(`<< /Length ${pageStream.length} >>\nstream\n${pageStream}\nendstream`);
+    pageIds.push(pageId);
+  });
+  objects[1] = `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>`;
+
+  let pdf = "%PDF-1.4\n";
+  const offsets = [0];
+  objects.forEach((content, index) => {
+    offsets.push(pdf.length);
+    pdf += `${index + 1} 0 obj\n${content}\nendobj\n`;
+  });
+  const xrefStart = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => {
+    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+  });
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+  return new Blob([pdf], { type: "application/pdf" });
+}
+
+renderFutureCompassQuestions();
+updateFutureCompassProgress();
+
+futureCompassForm?.addEventListener("input", () => {
+  clearFutureCompassError();
+  updateFutureCompassProgress();
+});
+
+futureCompassForm?.addEventListener("change", () => {
+  clearFutureCompassError();
+  updateFutureCompassProgress();
+});
+
+futureCompassForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!validateFutureCompass()) return;
+  const data = new FormData(futureCompassForm);
+  latestFutureCompass = calculateFutureCompass(data);
+  submitFutureCompassToGoogleForm(data);
+  renderFutureCompassReport();
+});
+
+futureCompassDownload?.addEventListener("click", () => {
+  if (!latestFutureCompass) {
+    showFutureCompassError("Please generate the Future Compass report before downloading the PDF.");
+    return;
+  }
+  downloadBlob(createStyledFutureCompassPdfBlob(), `SFIS-Future-Compass-${safeDownloadName(latestFutureCompass.studentName)}.pdf`);
+});
+
+const parentResourceDownloads = {
+  "reading-checklist": {
+    title: "Reading Checklist by Age",
+    filename: "SFIS-Reading-Checklist-by-Age.pdf",
+    accent: "teal",
+    summary: "A parent-friendly guide to understand whether reading is becoming joyful, confident, and age-appropriate for your child.",
+    sections: [
+      {
+        title: "How to Use This Guide",
+        body: [
+          "Reading growth is not a race. Some children read early, some take time, and many grow faster when parents create a calm routine instead of pressure. Use this guide once a month and notice patterns: interest, confidence, understanding, and expression.",
+          "If your child is still building a skill, mark it as 'in progress'. The goal is to understand what support is needed, not to label the child.",
+        ],
+      },
+      {
+        title: "Ages 3 to 5: Early Reading Signals",
+        style: "checklist",
+        items: [
+          "Enjoys picture books and listens to short stories for a few minutes.",
+          "Recognizes familiar sounds, rhymes, and repeated words.",
+          "Can retell a simple story using their own words or gestures.",
+          "Holds books correctly, turns pages, and notices pictures carefully.",
+          "Begins recognizing letters in their own name or common signs.",
+          "Can identify some colors, objects, animals, and actions in pictures.",
+        ],
+      },
+      {
+        title: "Ages 6 to 8: Growing Reading Confidence",
+        style: "checklist",
+        items: [
+          "Reads simple sentences with growing fluency and less hesitation.",
+          "Understands what happened first, next, and last in a story.",
+          "Can answer who, what, where, when, and why questions.",
+          "Reads aloud for 10 to 15 minutes with gentle support.",
+          "Shows interest in new words and asks what they mean.",
+          "Can connect a story to real life, family, school, or friends.",
+        ],
+      },
+      {
+        title: "Ages 9 to 10: Independent Reading Habits",
+        style: "checklist",
+        items: [
+          "Reads short chapters, articles, or information pages independently.",
+          "Can summarize the main idea in a few clear sentences.",
+          "Makes predictions and explains why something may happen next.",
+          "Uses a dictionary, asks questions, or understands meaning from context.",
+          "Reads for information, enjoyment, school projects, and curiosity.",
+          "Can discuss characters, choices, problems, and solutions in a story.",
+        ],
+      },
+      {
+        title: "7-Day Home Reading Rhythm",
+        style: "numbered",
+        items: [
+          "Choose a fixed 15-minute reading window, preferably before screen time.",
+          "Let the child select one book and the parent select one book each week.",
+          "Ask one open-ended question: 'What surprised you?' or 'What would you do?'",
+          "Keep a word treasure list with five new words every week.",
+          "Use bedtime storytelling once or twice a week, even for older children.",
+          "Celebrate effort, expression, and understanding instead of only speed.",
+        ],
+      },
+      {
+        title: "When Extra Support May Help",
+        style: "prompt",
+        items: [
+          "Your child avoids reading repeatedly, even with easy books.",
+          "They read words but cannot explain the meaning.",
+          "They lose place often, skip lines, or get tired very quickly.",
+          "They feel embarrassed while reading aloud.",
+          "You notice a gap between oral storytelling and written reading.",
+        ],
+      },
+      {
+        title: "Parent Reflection",
+        body: [
+          "This week, observe one thing: does your child enjoy the reading moment, or does reading feel like a test? A peaceful reading routine often improves confidence faster than long correction sessions.",
+          "At SFIS, reading will be treated as a foundation for communication, confidence, and thinking, not only as a textbook skill.",
+        ],
+      },
+    ],
+  },
+  "school-readiness": {
+    title: "School Readiness Checklist",
+    filename: "SFIS-School-Readiness-Checklist.pdf",
+    accent: "gold",
+    summary: "A gentle readiness guide for independence, communication, confidence, routine, and classroom habits before the next school step.",
+    sections: [
+      {
+        title: "Readiness Means Comfort, Not Perfection",
+        body: [
+          "A school-ready child is not a child who already knows everything. A school-ready child is able to try, ask for help, follow simple routines, and slowly become comfortable in a group learning environment.",
+          "Parents can use this checklist to build small habits at home. Even 10 minutes of consistent practice every day can make the first school months smoother.",
+        ],
+      },
+      {
+        title: "Independence Skills",
+        style: "checklist",
+        items: [
+          "Uses the washroom with age-appropriate independence.",
+          "Opens lunch box and water bottle with minimal help.",
+          "Keeps shoes, bag, bottle, and basic belongings in one place.",
+          "Can follow a two-step instruction such as 'pack your book and sit down'.",
+          "Can eat without long distraction and understands basic table manners.",
+          "Attempts small tasks before saying 'I cannot do it'.",
+        ],
+      },
+      {
+        title: "Communication and Confidence",
+        style: "checklist",
+        items: [
+          "Can say their name, parent name, and basic needs clearly.",
+          "Can ask for help when confused, uncomfortable, or unwell.",
+          "Can answer simple questions in words or short sentences.",
+          "Can greet teachers, respond to instructions, and use polite words.",
+          "Can share an idea, choice, or feeling with an adult.",
+        ],
+      },
+      {
+        title: "Emotional Readiness",
+        style: "checklist",
+        items: [
+          "Can separate from parents with reassurance and routine.",
+          "Can wait briefly for their turn during an activity.",
+          "Can recover from small disappointment with support.",
+          "Shows curiosity about school routines, teachers, and friends.",
+          "Can accept simple correction without feeling deeply discouraged.",
+        ],
+      },
+      {
+        title: "Home Practice Plan",
+        style: "numbered",
+        items: [
+          "Create a morning routine chart with wake up, freshen up, breakfast, bag, and goodbye.",
+          "Practice one independence habit every week instead of correcting everything together.",
+          "Do five-minute role play: asking teacher for water, help, or permission.",
+          "Give small responsibilities such as arranging pencils or placing books on a shelf.",
+          "Praise effort using exact words: 'You tried opening it yourself. That is progress.'",
+        ],
+      },
+      {
+        title: "Parent Reflection",
+        body: [
+          "Readiness grows through repeated comfort. When home and school use similar routines, children settle faster and feel safer.",
+          "At SFIS, early classroom habits will be connected with communication, discipline, confidence, and care so children can learn without fear.",
+        ],
+      },
+    ],
+  },
+  "screen-time": {
+    title: "Screen Time Guide",
+    filename: "SFIS-Screen-Time-Guide.pdf",
+    accent: "blue",
+    summary: "A practical family guide to make technology useful, calm, limited, and balanced with sleep, reading, outdoor play, and real conversation.",
+    sections: [
+      {
+        title: "Technology Needs Guidance",
+        body: [
+          "Screens are not the enemy. Unplanned screen use is the problem. Children can learn, create, and explore through technology, but they also need sleep, movement, reading, family talk, and hands-on play.",
+          "This guide helps parents move from daily arguments to clear family rules. The strongest rule is one that is simple, visible, and followed by adults too.",
+        ],
+      },
+      {
+        title: "Healthy Screen Rules",
+        style: "checklist",
+        items: [
+          "Keep screens away during meals, homework focus time, and bedtime.",
+          "Use screens in shared family spaces when possible.",
+          "Prefer educational, creative, or interactive content over endless scrolling.",
+          "Avoid fast-changing videos and gaming just before sleep.",
+          "Create screen-free time for reading, outdoor play, art, and conversation.",
+          "Do not use screens as the first solution for boredom every time.",
+        ],
+      },
+      {
+        title: "Quality Questions for Parents",
+        style: "prompt",
+        items: [
+          "Is my child learning, creating, solving, or only watching passively?",
+          "Is the content calm, age-appropriate, and safe?",
+          "Can my child explain what they watched, made, or learned?",
+          "Does screen time affect sleep, behavior, attention, or patience?",
+          "Is my child able to stop when time is over without a major struggle?",
+        ],
+      },
+      {
+        title: "A Simple Family Agreement",
+        style: "numbered",
+        items: [
+          "Decide daily screen windows in advance, not during an argument.",
+          "Use a timer so the rule feels neutral and predictable.",
+          "Keep one screen-free family hour every evening.",
+          "Replace screen time with ready options: book, drawing, walk, puzzle, music, or board game.",
+          "Review the rule every Sunday and adjust if school work, sleep, or behavior is affected.",
+        ],
+      },
+      {
+        title: "Better Screen Choices",
+        style: "checklist",
+        items: [
+          "Drawing, coding, storytelling, music, robotics, or guided learning apps.",
+          "Documentaries and explainer videos watched with parent discussion.",
+          "Video calls with family used for real connection.",
+          "Research for school projects followed by handwritten notes.",
+          "Creative challenges where the child makes something after watching.",
+        ],
+      },
+      {
+        title: "Parent Reflection",
+        body: [
+          "A child who can use technology with balance is better prepared for the future than a child who is either overexposed or completely unguided.",
+          "At SFIS, technology will be positioned as a tool for learning, problem-solving, creativity, and responsible digital habits.",
+        ],
+      },
+    ],
+  },
+  "child-questions": {
+    title: "50 Questions to Ask Your Child",
+    filename: "SFIS-50-Questions-to-Ask-Your-Child.pdf",
+    accent: "teal",
+    summary: "Conversation prompts that help parents understand feelings, friendships, curiosity, confidence, dreams, and hidden worries.",
+    sections: [
+      {
+        title: "Why Questions Matter",
+        body: [
+          "Children often share more when questions feel warm, specific, and pressure-free. Instead of asking only 'How was school?', try questions that invite stories, feelings, ideas, and choices.",
+          "Use two or three questions at a time. The best conversations happen during a walk, bedtime, meal time, drawing, or a quiet drive.",
+        ],
+      },
+      {
+        title: "Feelings and Confidence",
+        style: "numbered",
+        items: [
+          "What made you smile today?",
+          "What felt difficult today?",
+          "When did you feel proud of yourself?",
+          "What is something you want to try again?",
+          "What helps you feel brave?",
+          "What do you do when you feel nervous?",
+          "Who made you feel happy today?",
+          "What is one thing you are getting better at?",
+          "What would you like me to understand about you?",
+          "What kind words did you hear or say today?",
+        ],
+      },
+      {
+        title: "Learning and Curiosity",
+        style: "numbered",
+        start: 11,
+        items: [
+          "What new thing did you learn?",
+          "What question did you ask today?",
+          "What do you want to know more about?",
+          "Which subject felt interesting today?",
+          "If you could build anything, what would it be?",
+          "What book or story do you remember?",
+          "What problem did you solve?",
+          "What confused you?",
+          "What would you teach someone else?",
+          "What idea came to your mind today?",
+        ],
+      },
+      {
+        title: "Friendship and Values",
+        style: "numbered",
+        start: 21,
+        items: [
+          "Who did you help today?",
+          "Who helped you today?",
+          "What makes someone a good friend?",
+          "Did you include someone in a game?",
+          "What should we do when someone feels left out?",
+          "What does respect mean to you?",
+          "What rule do you think is important?",
+          "How can we make someone feel welcome?",
+          "What was a kind choice you made?",
+          "What can you do when friends disagree?",
+        ],
+      },
+      {
+        title: "Dreams and Habits",
+        style: "numbered",
+        start: 31,
+        items: [
+          "What do you want to become better at?",
+          "What is one dream you have?",
+          "What habit should we practice at home?",
+          "What do you want to create this week?",
+          "What makes you feel focused?",
+          "What distracts you?",
+          "What is one thing you want to do by yourself?",
+          "What makes school exciting?",
+          "What do you want your teacher to know?",
+          "What is one goal for tomorrow?",
+        ],
+      },
+      {
+        title: "Family Conversations",
+        style: "numbered",
+        start: 41,
+        items: [
+          "What should we do together this weekend?",
+          "What family rule do you like?",
+          "What is your favorite time of day?",
+          "What makes our home happy?",
+          "What can we learn together?",
+          "What are you thankful for?",
+          "What would make tomorrow better?",
+          "What do you want to talk about more?",
+          "What is one thing I can help you with?",
+          "What was the best part of your day?",
+        ],
+      },
+      {
+        title: "Parent Tip",
+        body: [
+          "When a child answers, resist immediately correcting or advising. First say, 'Tell me more.' Listening builds trust, and trust makes future guidance easier.",
+          "At SFIS, communication, confidence, empathy, and expression are treated as important life skills.",
+        ],
+      },
+    ],
+  },
+  "summer-planner": {
+    title: "Summer Learning Planner",
+    filename: "SFIS-Summer-Learning-Planner.pdf",
+    accent: "gold",
+    summary: "A balanced holiday plan that keeps children active, curious, creative, responsible, and connected without making summer feel stressful.",
+    sections: [
+      {
+        title: "Summer Should Build Energy",
+        body: [
+          "A good summer plan protects childhood while keeping the learning rhythm alive. The aim is not to fill every hour. The aim is to balance reading, movement, creativity, responsibility, family time, and gentle revision.",
+          "Use this planner as a flexible weekly rhythm. If the child is tired, travel is planned, or family events are happening, adjust the week without guilt.",
+        ],
+      },
+      {
+        title: "Weekly Balance",
+        style: "checklist",
+        items: [
+          "Reading: 20 minutes a day with one discussion question.",
+          "Writing: three short journal entries per week.",
+          "Math: 15 minutes of fun practice, four days a week.",
+          "Creativity: drawing, craft, music, story, model-making, or building.",
+          "Outdoor play: movement every day.",
+          "Life skills: one home responsibility every week.",
+          "Family connection: one shared activity without screens.",
+        ],
+      },
+      {
+        title: "Monday to Friday Rhythm",
+        style: "numbered",
+        items: [
+          "Morning: reading, revision, or handwriting before screens.",
+          "Late morning: one small responsibility such as plants, shelf, bag, or table.",
+          "Afternoon: creative project, puzzle, storytelling, or skill practice.",
+          "Evening: outdoor play, cycling, yoga, badminton, cricket, or walk.",
+          "Night: two-minute reflection: 'What did I learn or create today?'",
+        ],
+      },
+      {
+        title: "Weekend Ideas",
+        style: "prompt",
+        items: [
+          "Visit a library, garden, market, museum, farm, or local place of interest.",
+          "Cook one simple recipe together and let the child explain the steps.",
+          "Create a family story night where everyone adds one part.",
+          "Build a small science, craft, gardening, or recycling project.",
+          "Call grandparents and ask about childhood games or school memories.",
+          "Make a photo diary of one meaningful day.",
+        ],
+      },
+      {
+        title: "Four-Week Mini Challenge",
+        style: "numbered",
+        items: [
+          "Week 1: Finish one book and share the story in five sentences.",
+          "Week 2: Create one model, poster, poem, or performance.",
+          "Week 3: Learn one life skill such as folding clothes, watering plants, or setting a table.",
+          "Week 4: Present one topic to the family for two minutes.",
+        ],
+      },
+      {
+        title: "Parent Reminder",
+        body: [
+          "Summer learning should feel balanced, not stressful. A child who reads, plays, helps, creates, and speaks confidently is developing many future skills at the same time.",
+          "At SFIS, holidays and school routines will be seen as part of the same growth journey: academics, confidence, sports, creativity, and character.",
+        ],
+      },
+    ],
+  },
+};
+
+function createStyledResourcePdfBlob(resource) {
+  const objects = [];
+  const addObject = (content) => {
+    objects.push(content);
+    return objects.length;
+  };
+  const pageStreams = [];
+  let stream = [];
+  let y = 680;
+
+  const palette = {
+    night: [0.02, 0.075, 0.065],
+    ink: [0.075, 0.12, 0.105],
+    muted: [0.36, 0.42, 0.39],
+    panel: [0.955, 0.965, 0.94],
+    soft: [0.985, 0.975, 0.93],
+    white: [1, 1, 1],
+    teal: [0.13, 0.78, 0.64],
+    gold: [0.95, 0.72, 0.28],
+    blue: [0.26, 0.48, 0.88],
+    line: [0.82, 0.86, 0.78],
+  };
+  const accent = palette[resource.accent] || palette.teal;
+  const color = ([r, g, b]) => `${r} ${g} ${b}`;
+  const rect = (x, ry, width, height, fill, stroke = null) => {
+    stream.push("q");
+    if (fill) stream.push(`${color(fill)} rg`);
+    if (stroke) stream.push(`${color(stroke)} RG`);
+    stream.push(`${x} ${ry} ${width} ${height} re ${stroke ? "B" : "f"}`);
+    stream.push("Q");
+  };
+  const circle = (x, cy, r, fill) => {
+    stream.push("q");
+    stream.push(`${color(fill)} rg`);
+    stream.push(`${x - r} ${cy} m ${x - r} ${cy + r * 0.55} ${x - r * 0.55} ${cy + r} ${x} ${cy + r} c ${x + r * 0.55} ${cy + r} ${x + r} ${cy + r * 0.55} ${x + r} ${cy} c ${x + r} ${cy - r * 0.55} ${x + r * 0.55} ${cy - r} ${x} ${cy - r} c ${x - r * 0.55} ${cy - r} ${x - r} ${cy - r * 0.55} ${x - r} ${cy} c f`);
+    stream.push("Q");
+  };
+  const text = (value, x, ty, size = 10, font = "F1", fill = palette.ink) => {
+    stream.push("BT");
+    stream.push(`/${font} ${size} Tf`);
+    stream.push(`${color(fill)} rg`);
+    stream.push(`${x} ${ty} Td`);
+    stream.push(`(${pdfSafeText(value)}) Tj`);
+    stream.push("ET");
+  };
+  const wrappedLines = (value, width, size = 10) => wrapPdfLine(value, Math.max(24, Math.floor(width / (size * 0.52))));
+  const itemHeight = (item, width, size = 9.5) => wrappedLines(item, width, size).length * 12 + 9;
+  const footer = () => {
+    const pageNo = pageStreams.length + 1;
+    rect(36, 31, 540, 1, palette.line);
+    text("Stone Field International School | Parent Resource Library", 42, 17, 8, "F1", palette.muted);
+    text(`Page ${pageNo}`, 540, 17, 8, "F2", palette.muted);
+  };
+  const finishPage = () => {
+    if (!stream.length) return;
+    footer();
+    pageStreams.push(stream.join("\n"));
+    stream = [];
+  };
+  const startPage = () => {
+    finishPage();
+    rect(0, 0, 612, 792, palette.panel);
+    rect(0, 724, 612, 68, palette.night);
+    rect(0, 724, 612, 5, accent);
+    text("Stone Field International School", 42, 759, 13, "F2", palette.white);
+    text("Parent Resource Library", 42, 741, 9, "F1", palette.white);
+    text(new Date().toLocaleDateString(), 504, 750, 9, "F1", palette.white);
+    y = 690;
+  };
+  const ensure = (height) => {
+    if (y - height < 56) startPage();
+  };
+  const renderSection = (section, index) => {
+    const bodyLines = (section.body || []).flatMap((line) => wrappedLines(line, 466, 9.6));
+    const items = section.items || [];
+    const listHeight = items.reduce((total, item) => total + itemHeight(item, 428), 0);
+    const height = 54 + bodyLines.length * 13 + listHeight + (items.length ? 8 : 0);
+    ensure(height);
+    rect(36, y - height, 540, height, palette.white, palette.line);
+    rect(36, y - height, 7, height, index % 2 ? palette.gold : accent);
+    circle(64, y - 28, 12, index % 2 ? palette.gold : accent);
+    text(String(index + 1).padStart(2, "0"), 57, y - 32, 8, "F2", palette.night);
+    text(section.title, 88, y - 31, 14, "F2", palette.ink);
+    let currentY = y - 55;
+    bodyLines.forEach((line) => {
+      text(line, 58, currentY, 9.6, "F1", palette.muted);
+      currentY -= 13;
+    });
+    if (items.length && bodyLines.length) currentY -= 6;
+    items.forEach((item, itemIndex) => {
+      const lines = wrappedLines(item, 428, 9.5);
+      if (section.style === "numbered") {
+        const itemNumber = (section.start || 1) + itemIndex;
+        circle(65, currentY + 1, 8, index % 2 ? accent : palette.gold);
+        text(String(itemNumber), itemNumber > 9 ? 60 : 62, currentY - 2, 7, "F2", palette.night);
+      } else if (section.style === "checklist") {
+        rect(58, currentY - 7, 11, 11, palette.soft, accent);
+      } else {
+        rect(56, currentY - 9, 54, 15, palette.soft, accent);
+        text("Reflect", 66, currentY - 5, 7, "F2", palette.ink);
+      }
+      const textX = section.style === "prompt" ? 122 : 82;
+      lines.forEach((line, lineIndex) => {
+        text(line, textX, currentY - lineIndex * 12, 9.5, "F1", palette.ink);
+      });
+      currentY -= lines.length * 12 + 9;
+    });
+    y -= height + 14;
+  };
+
+  startPage();
+  rect(36, y - 134, 540, 134, palette.night);
+  rect(54, y - 110, 118, 64, accent);
+  text("FREE", 77, y - 69, 22, "F2", palette.night);
+  text("PARENT GUIDE", 69, y - 88, 8, "F2", palette.night);
+  text(resource.title, 194, y - 50, resource.title.length > 33 ? 21 : 24, "F2", palette.gold);
+  wrappedLines(resource.summary, 330, 10.5).forEach((line, index) => {
+    text(line, 196, y - 76 - index * 14, 10.5, "F1", palette.white);
+  });
+  y -= 156;
+  rect(36, y - 64, 540, 64, palette.soft, palette.line);
+  text("Designed for parents of young learners", 58, y - 25, 13, "F2", palette.ink);
+  text("Read, mark, discuss, and revisit this guide as your child grows.", 58, y - 45, 9.5, "F1", palette.muted);
+  y -= 84;
+
+  resource.sections.forEach((section, index) => renderSection(section, index));
+  ensure(76);
+  rect(36, y - 70, 540, 70, palette.night);
+  text("Next Step", 58, y - 26, 13, "F2", palette.gold);
+  text("Save this PDF, revisit it monthly, and use it as a warm conversation starter with your child.", 58, y - 45, 9.5, "F1", palette.white);
+  text("For school enquiries, WhatsApp: 8826758881", 58, y - 59, 9.5, "F2", accent);
+  finishPage();
+
+  addObject("<< /Type /Catalog /Pages 2 0 R >>");
+  addObject("");
+  addObject("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+  addObject("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
+
+  const pageIds = [];
+  pageStreams.forEach((pageStream) => {
+    const contentId = objects.length + 2;
+    const pageId = addObject(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentId} 0 R >>`);
+    addObject(`<< /Length ${pageStream.length} >>\nstream\n${pageStream}\nendstream`);
+    pageIds.push(pageId);
+  });
+  objects[1] = `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>`;
+
+  let pdf = "%PDF-1.4\n";
+  const offsets = [0];
+  objects.forEach((content, index) => {
+    offsets.push(pdf.length);
+    pdf += `${index + 1} 0 obj\n${content}\nendobj\n`;
+  });
+  const xrefStart = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => {
+    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+  });
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+  return new Blob([pdf], { type: "application/pdf" });
+}
+
+function downloadParentResource(resourceKey) {
+  const resource = parentResourceDownloads[resourceKey];
+  if (!resource) return;
+  downloadBlob(createStyledResourcePdfBlob(resource), resource.filename);
+}
+
+function showResourceLeadError(message) {
+  if (!resourceLeadError) return;
+  resourceLeadError.textContent = message;
+  resourceLeadError.hidden = false;
+}
+
+function clearResourceLeadError() {
+  if (!resourceLeadError) return;
+  resourceLeadError.textContent = "";
+  resourceLeadError.hidden = true;
+}
+
+function openResourceLeadModal(resourceKey) {
+  const resource = parentResourceDownloads[resourceKey];
+  if (!resourceLeadModal || !resourceLeadForm || !resource) {
+    downloadParentResource(resourceKey);
+    return;
+  }
+  pendingResourceDownloadKey = resourceKey;
+  resourceLeadForm.reset();
+  clearResourceLeadError();
+  if (resourceLeadTitleInput) resourceLeadTitleInput.value = resource.title;
+  const title = resourceLeadModal.querySelector("#resourceLeadTitle");
+  if (title) title.textContent = `Get ${resource.title}`;
+  resourceLeadModal.hidden = false;
+  resourceLeadForm.querySelector("input")?.focus({ preventScroll: true });
+}
+
+function closeResourceLeadModal() {
+  if (!resourceLeadModal) return;
+  resourceLeadModal.hidden = true;
+  pendingResourceDownloadKey = "";
+  clearResourceLeadError();
+}
+
+function validateResourceLeadForm(data) {
+  const required = [
+    ["resourceParentName", "parent name"],
+    ["resourceChildName", "child name"],
+    ["resourceMobile", "mobile number"],
+    ["resourceEmail", "email"],
+  ];
+  const missing = required.find(([field]) => !String(data.get(field) || "").trim());
+  if (missing) return `Please enter ${missing[1]} before downloading the guide.`;
+  const mobile = String(data.get("resourceMobile") || "").replace(/\D/g, "");
+  if (mobile.length < 10) return "Please enter a valid 10-digit mobile number.";
+  const email = String(data.get("resourceEmail") || "").trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email address.";
+  return "";
+}
+
+resourceDownloadButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    openResourceLeadModal(button.dataset.resourceDownload);
+  });
+});
+
+document.querySelectorAll("[data-resource-lead-close]").forEach((button) => {
+  button.addEventListener("click", closeResourceLeadModal);
+});
+
+resourceLeadForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const resource = parentResourceDownloads[pendingResourceDownloadKey];
+  if (!resource) return;
+  const data = new FormData(resourceLeadForm);
+  const error = validateResourceLeadForm(data);
+  if (error) {
+    showResourceLeadError(error);
+    return;
+  }
+  clearResourceLeadError();
+  submitResourceToGoogleForm(data, resource);
+  downloadParentResource(pendingResourceDownloadKey);
+  closeResourceLeadModal();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && resourceLeadModal && !resourceLeadModal.hidden) {
+    closeResourceLeadModal();
+  }
+});
 
 function downloadBlueprintPdf() {
   const validation = validateBlueprintForm({
