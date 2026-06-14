@@ -1,5 +1,6 @@
 const menuButton = document.querySelector(".menu-button");
 const megaMenu = document.querySelector(".mega-menu");
+const navDropdowns = document.querySelectorAll(".nav-dropdown");
 const enquiryForm = document.querySelector(".enquiry-form");
 const blueprintForm = document.querySelector(".blueprint-form");
 const blueprintGate = document.querySelector(".blueprint-gate");
@@ -32,7 +33,9 @@ const whatsappNumber = "918826758881";
 const landingPopupSeenKey = "sfisLandingPopupSeen";
 const savedBlueprintKey = "sfisFutureSparkReport";
 const blueprintGoogleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdX-9JaaRy0_KRHkWwxy6-IvxYKSPqS3G2UBkYKIKmlQ_TTHw/formResponse";
+const futureCompassGoogleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLScMaSwd0QQUIu2KrpGePXvI0ZkBcFv292iRS1KJUgWf0mg21g/formResponse";
 const pendingBlueprintLeadKey = "sfisPendingBlueprintLead";
+const pendingFutureCompassLeadKey = "sfisPendingFutureCompassLead";
 
 const parentBotQuickQuestions = [
   "When will admissions open?",
@@ -288,8 +291,37 @@ megaMenu?.addEventListener("click", (event) => {
   if (event.target.matches("a")) setMenu(false);
 });
 
+function closeNavDropdowns(exceptDropdown = null) {
+  navDropdowns.forEach((dropdown) => {
+    if (dropdown === exceptDropdown) return;
+    dropdown.classList.remove("is-open");
+    dropdown.querySelector(".nav-dropdown-toggle")?.setAttribute("aria-expanded", "false");
+  });
+}
+
+navDropdowns.forEach((dropdown) => {
+  const toggle = dropdown.querySelector(".nav-dropdown-toggle");
+  const menu = dropdown.querySelector(".nav-dropdown-menu");
+  toggle?.setAttribute("aria-expanded", "false");
+  toggle?.addEventListener("click", (event) => {
+    event.preventDefault();
+    const willOpen = !dropdown.classList.contains("is-open");
+    closeNavDropdowns(dropdown);
+    dropdown.classList.toggle("is-open", willOpen);
+    toggle.setAttribute("aria-expanded", String(willOpen));
+  });
+  menu?.addEventListener("click", (event) => {
+    if (event.target.matches("a")) closeNavDropdowns();
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".nav-dropdown")) closeNavDropdowns();
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") setMenu(false);
+  if (event.key === "Escape") closeNavDropdowns();
   if (event.key === "Escape" && landingPopup?.classList.contains("is-open")) closeLandingPopup();
 });
 
@@ -366,20 +398,26 @@ function saveLatestBlueprint() {
   }
 }
 
-function submitLeadToGoogleForm(lead) {
+function submitLeadToGoogleForm(lead, options = {}) {
+  const formUrl = options.formUrl || blueprintGoogleFormUrl;
+  const pendingKey = options.pendingKey || pendingBlueprintLeadKey;
+  const extraEntries = options.extraEntries || {};
   const payload = new URLSearchParams();
   payload.set("entry.1434087836", String(lead.fatherName || "").trim());
   payload.set("entry.533861399", String(lead.childName || "").trim());
   payload.set("entry.2056952779", String(lead.mobile || "").trim());
   payload.set("entry.1366045606", String(lead.email || "").trim());
+  Object.entries(extraEntries).forEach(([entry, value]) => {
+    payload.set(entry, String(value || "").trim());
+  });
 
   if (window.location.protocol === "file:") {
-    localStorage.setItem(pendingBlueprintLeadKey, payload.toString());
+    localStorage.setItem(pendingKey, payload.toString());
     console.warn("Google Form submission is skipped in file mode. Open the site with http://localhost or publish it online to submit leads.");
     return;
   }
 
-  fetch(blueprintGoogleFormUrl, {
+  fetch(formUrl, {
     method: "POST",
     mode: "no-cors",
     body: payload,
@@ -417,26 +455,40 @@ function submitResourceToGoogleForm(data, resource) {
 }
 
 function submitFutureCompassToGoogleForm(data) {
-  submitLeadToGoogleForm({
-    fatherName: data.get("fcParentName"),
-    childName: `${data.get("fcStudentName")} | Future Compass ${data.get("fcGrade")}`,
-    mobile: data.get("fcMobile"),
-    email: data.get("fcEmail"),
-  });
+  submitLeadToGoogleForm(
+    {
+      fatherName: data.get("fcParentName"),
+      childName: data.get("fcStudentName"),
+      mobile: data.get("fcMobile"),
+      email: data.get("fcEmail"),
+    },
+    {
+      formUrl: futureCompassGoogleFormUrl,
+      pendingKey: pendingFutureCompassLeadKey,
+      extraEntries: {
+        "entry.2132146691": data.get("fcGrade"),
+      },
+    }
+  );
 }
 
-function submitPendingBlueprintLead() {
-  const pendingPayload = localStorage.getItem(pendingBlueprintLeadKey);
+function submitPendingGoogleFormLead(pendingKey, formUrl) {
+  const pendingPayload = localStorage.getItem(pendingKey);
   if (!pendingPayload || window.location.protocol === "file:") return;
-  fetch(blueprintGoogleFormUrl, {
+  fetch(formUrl, {
     method: "POST",
     mode: "no-cors",
     body: new URLSearchParams(pendingPayload),
   })
-    .then(() => localStorage.removeItem(pendingBlueprintLeadKey))
+    .then(() => localStorage.removeItem(pendingKey))
     .catch((error) => {
       console.warn("Pending Google Form submission could not be completed.", error);
     });
+}
+
+function submitPendingBlueprintLead() {
+  submitPendingGoogleFormLead(pendingBlueprintLeadKey, blueprintGoogleFormUrl);
+  submitPendingGoogleFormLead(pendingFutureCompassLeadKey, futureCompassGoogleFormUrl);
 }
 
 submitPendingBlueprintLead();
