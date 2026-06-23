@@ -4622,3 +4622,199 @@ h3 {
     padding-inline: 10px;
   }
 }
+
+@media (max-width: 760px) {
+  .about-mission-hero,
+  .about-belief-section,
+  .about-growth-studio,
+  .founder-vision-section,
+  .about-ecosystem-section,
+  .about-timeline-section,
+  .about-cta-section {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .about-mission-hero {
+    gap: 24px;
+    padding: 104px 14px 42px;
+  }
+
+  .about-mission-hero .page-intro {
+    max-width: 100%;
+  }
+
+  .about-mission-hero h1,
+  .about-growth-studio h2,
+  .founder-vision-section h2,
+  .about-ecosystem-section h2,
+  .about-timeline-section h2,
+  .about-cta-section h2 {
+    font-size: clamp(2rem, 9vw, 2.85rem);
+    line-height: 1.06;
+  }
+
+  .about-mission-hero .lead,
+  .growth-studio-copy p:not(.eyebrow),
+  .founder-vision-copy p:not(.eyebrow),
+  .about-cta-section p {
+    font-size: 1rem;
+    line-height: 1.62;
+  }
+
+  .about-hero-actions,
+  .about-cta-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .about-hero-actions a,
+  .about-cta-actions a {
+    width: 100%;
+  }
+
+  .about-hero-orbit {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+    padding: 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .about-hero-orbit strong {
+    grid-column: 1 / -1;
+    width: 74px;
+    height: 74px;
+    justify-self: center;
+    order: -1;
+    font-size: 0.98rem;
+  }
+
+  .about-hero-orbit span,
+  .about-hero-orbit span:nth-child(n) {
+    position: static;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.74rem;
+  }
+
+  .belief-grid,
+  .ecosystem-grid,
+  .about-timeline,
+  .mission-teaser-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .belief-grid article,
+  .ecosystem-grid article,
+  .about-timeline article,
+  .mission-teaser-grid article {
+    padding: 18px;
+  }
+
+  .about-growth-studio {
+    gap: 22px;
+    padding: 50px 14px;
+  }
+
+  .growth-studio-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .growth-studio-tabs button {
+    width: 100%;
+    justify-content: center;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .growth-studio-stage {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .growth-radar {
+    width: min(230px, 100%);
+    min-height: 0;
+    margin: 0 auto;
+  }
+
+  .growth-radar strong {
+    width: 70px;
+    height: 70px;
+    font-size: 0.9rem;
+  }
+
+  .growth-result-card {
+    padding: 16px;
+  }
+
+  .growth-result-card h3 {
+    font-size: clamp(1.45rem, 7vw, 2rem);
+    line-height: 1.08;
+  }
+
+  .growth-meter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .founder-vision-section {
+    gap: 22px;
+  }
+
+  .founder-vision-cards article {
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .founder-vision-cards img {
+    width: 74px;
+    height: 92px;
+  }
+
+  .founder-vision-cards strong {
+    font-size: 0.96rem;
+    line-height: 1.24;
+  }
+
+  .founder-vision-cards p {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 390px) {
+  .about-mission-hero h1,
+  .about-growth-studio h2,
+  .founder-vision-section h2,
+  .about-ecosystem-section h2,
+  .about-timeline-section h2,
+  .about-cta-section h2 {
+    font-size: 1.9rem;
+  }
+
+  .about-hero-orbit {
+    grid-template-columns: 1fr;
+  }
+
+  .founder-vision-cards article {
+    grid-template-columns: 1fr;
+  }
+
+  .founder-vision-cards img {
+    width: 100%;
+    height: 180px;
+  }
+}
