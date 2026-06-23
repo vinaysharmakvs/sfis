@@ -29,6 +29,8 @@ const futureCompassProgress = document.querySelector("[data-fc-progress]");
 const futureCompassError = document.querySelector(".future-compass-error");
 const futureCompassReport = document.querySelector(".future-compass-report");
 const futureCompassDownload = document.querySelector("[data-fc-download]");
+const growthStudioButtons = document.querySelectorAll("[data-growth-focus]");
+const growthStudioStage = document.querySelector("[data-growth-stage]");
 const whatsappNumber = "918826758881";
 const landingPopupSeenKey = "sfisLandingPopupSeen";
 const savedBlueprintKey = "sfisFutureSparkReport";
@@ -36,6 +38,59 @@ const blueprintGoogleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdX-9Ja
 const futureCompassGoogleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLScMaSwd0QQUIu2KrpGePXvI0ZkBcFv292iRS1KJUgWf0mg21g/formResponse";
 const pendingBlueprintLeadKey = "sfisPendingBlueprintLead";
 const pendingFutureCompassLeadKey = "sfisPendingFutureCompassLead";
+
+const growthStudioData = {
+  stem: {
+    icon: "AI",
+    label: "STEM Builder",
+    title: "From curiosity to real projects.",
+    text: "Students explore computers, robotics, logic, research, and project presentation so technology becomes a tool for thinking, not only screen time.",
+    campus: "Computer + Robotics Labs",
+    principle: "Discover to Deliver",
+    outcome: "Build, test, present",
+    points: ["Hands-on coding and robotics exposure", "Guided questions, experiments, and demos", "Confidence to explain what they create"],
+  },
+  voice: {
+    icon: "MIC",
+    label: "Confident Speaker",
+    title: "From hesitation to expression.",
+    text: "Students build language, stage confidence, manners, leadership habits, and the courage to speak clearly in front of others.",
+    campus: "Communication + Theater",
+    principle: "Develop and Discipline",
+    outcome: "Speak, lead, present",
+    points: ["Daily communication and grooming signals", "Open-air theater and presentation moments", "Teacher guidance for respectful confidence"],
+  },
+  sports: {
+    icon: "RUN",
+    label: "Sports Performer",
+    title: "From energy to disciplined performance.",
+    text: "Students use sport to build teamwork, stamina, goal-setting, discipline, and healthy competitive spirit.",
+    campus: "Courts + Cricket Nets",
+    principle: "Discipline to Deliver",
+    outcome: "Train, compete, improve",
+    points: ["Basketball, badminton, cricket nets, and movement spaces", "Teamwork and leadership through sport", "Confidence built through visible progress"],
+  },
+  wellness: {
+    icon: "ZEN",
+    label: "Balanced Child",
+    title: "From pressure to inner balance.",
+    text: "Students need calm, focus, movement, rest, nature, and emotional steadiness along with academics and ambition.",
+    campus: "Yoga + Gardens",
+    principle: "Discover and Discipline",
+    outcome: "Focus, calm, grow",
+    points: ["Yoga retreat center and green spaces", "Better rhythm between study, play, and reflection", "A caring environment where children feel seen"],
+  },
+  career: {
+    icon: "10+",
+    label: "Future Planner",
+    title: "From marks to direction.",
+    text: "Students gradually understand strengths, streams, careers, competitive pathways, and the skills required for a changing world.",
+    campus: "Future Compass + Mentors",
+    principle: "Dream to Deliver",
+    outcome: "Choose, prepare, achieve",
+    points: ["Future Compass AI for Grade 8 onward conversations", "Competitive exam readiness at school itself", "Career awareness beyond traditional choices"],
+  },
+};
 
 const parentBotQuickQuestions = [
   "When will admissions open?",
@@ -158,6 +213,36 @@ function closeLandingPopup() {
   landingPopup?.classList.remove("is-open");
   markLandingPopupSeen();
 }
+
+function renderGrowthStudio(focus) {
+  const data = growthStudioData[focus] || growthStudioData.stem;
+  if (!growthStudioStage) return;
+  const setText = (selector, value) => {
+    const target = growthStudioStage.querySelector(selector);
+    if (target) target.textContent = value;
+  };
+  setText("[data-growth-icon]", data.icon);
+  setText("[data-growth-label]", data.label);
+  setText("[data-growth-title]", data.title);
+  setText("[data-growth-text]", data.text);
+  setText("[data-growth-campus]", data.campus);
+  setText("[data-growth-principle]", data.principle);
+  setText("[data-growth-outcome]", data.outcome);
+  const list = growthStudioStage.querySelector("[data-growth-points]");
+  if (list) {
+    list.innerHTML = data.points.map((point) => `<li>${point}</li>`).join("");
+  }
+  growthStudioStage.dataset.activeFocus = focus;
+}
+
+growthStudioButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    growthStudioButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+    renderGrowthStudio(button.dataset.growthFocus);
+  });
+});
+
+renderGrowthStudio("stem");
 
 const whatsappFloat = document.createElement("a");
 whatsappFloat.className = "whatsapp-float";
