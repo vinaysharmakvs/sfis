@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Investor Projection | Stone Field International School</title>
+    <meta
+      name="description"
+      content="Private investor projection calculator for Stone Field International School revenue, cost, staffing, and annual surplus planning."
+    />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <meta name="theme-color" content="#07110f" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="investor-page">
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Stone Field International School home">
+        <span class="brand-mark">SFIS</span>
+        <span>
+          <strong>Stone Field</strong>
+          <small>International School</small>
+        </span>
+      </a>
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="academics.html">Academics</a>
+        <a href="facilities.html">Facilities</a>
+        <a href="admissions.html">Admissions</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a class="chip-link" href="contact.html">Enquire Now</a>
+        <button class="menu-button" type="button" aria-expanded="false" aria-controls="megaMenu" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <aside class="mega-menu" id="megaMenu" aria-hidden="true">
+      <nav class="mega-links" aria-label="Expanded navigation">
+        <div class="mega-group">
+          <span class="mega-group-title">School</span>
+          <a href="index.html">Home <span>01</span></a>
+          <a href="about.html">About <span>02</span></a>
+          <a href="academics.html">Academics <span>03</span></a>
+          <a href="facilities.html">Facilities <span>04</span></a>
+          <a href="admissions.html">Admissions <span>05</span></a>
+          <a href="contact.html">Contact <span>06</span></a>
+        </div>
+      </nav>
+      <div class="mega-panel">
+        <p class="eyebrow">Private planning page</p>
+        <h2>Investor projection dashboard.</h2>
+        <p>Use projected student strength to review revenue, cost, staffing, and estimated surplus.</p>
+        <a class="primary-button" href="index.html">Back to Website</a>
+      </div>
+    </aside>
+
+    <main>
+      <section class="section investor-section" id="investor-calculator">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Private Investor Projection</p>
+            <h2>Revenue vs cost calculator.</h2>
+          </div>
+          <p>Enter projected student strength to see monthly revenue, annual collection, operating cost, and estimated surplus.</p>
+        </div>
+
+        <div class="investor-calculator">
+          <form class="investor-form" aria-label="Investor projection calculator">
+            <label for="investorStudents">Number of Students Projected</label>
+            <div class="investor-input-row">
+              <input id="investorStudents" name="students" type="number" min="1" step="1" value="200" required />
+              <button class="primary-button" type="submit">Generate Projection</button>
+            </div>
+            <p class="investor-note">Edit fee assumptions to compare different investor scenarios. Annual charges are counted one time per student for the year, not every month.</p>
+            <p class="investor-disclaimer">This projection is for representation and discussion only. Actual revenue, cost, payout structure, timelines, and investor terms will be calculated and finalized during detailed discussions.</p>
+            <div class="investor-assumption-grid" aria-label="Editable revenue assumptions">
+              <label>
+                Investor Amount
+                <select data-investor-input="investorPlan">
+                  <option value="5000000" selected>Rs. 50 Lac - 3.5% Equity</option>
+                  <option value="10000000">Rs. 1 Cr - 8.5% Equity</option>
+                </select>
+              </label>
+              <label>
+                Monthly Fees per Student
+                <input data-investor-input="monthlyFee" type="number" min="0" step="100" value="3000" />
+              </label>
+              <label>
+                Transport Fees per Student
+                <input data-investor-input="transportFee" type="number" min="0" step="100" value="1000" />
+              </label>
+              <label>
+                Annual Charges per Student
+                <input data-investor-input="annualCharge" type="number" min="0" step="500" value="10000" />
+              </label>
+              <label>
+                Admission Fee per Student
+                <input data-investor-input="admissionFee" type="number" min="0" step="500" value="12000" />
+              </label>
+              <label>
+                Teacher Ratio: 1 Teacher per Students
+                <input data-investor-input="teacherRatio" type="number" min="1" step="1" value="30" />
+              </label>
+              <label>
+                Amount per Teacher Average
+                <input data-investor-input="teacherSalary" type="number" min="0" step="500" value="15000" />
+              </label>
+              <label>
+                Support Staff Ratio: 1 Staff per Students
+                <input data-investor-input="supportStaffRatio" type="number" min="1" step="1" value="60" />
+              </label>
+              <label>
+                Support Staff Cost
+                <input data-investor-input="supportStaffSalary" type="number" min="0" step="500" value="5000" />
+              </label>
+              <label>
+                Cleaning Staff Ratio: 1 Staff per Students
+                <input data-investor-input="cleaningStaffRatio" type="number" min="1" step="1" value="60" />
+              </label>
+              <label>
+                Cleaning Staff Cost
+                <input data-investor-input="cleaningStaffSalary" type="number" min="0" step="500" value="5000" />
+              </label>
+              <label>
+                Driver Ratio: 1 Driver per Students
+                <input data-investor-input="driverRatio" type="number" min="1" step="1" value="50" />
+              </label>
+              <label>
+                Driver Cost
+                <input data-investor-input="driverSalary" type="number" min="0" step="500" value="10000" />
+              </label>
+              <label>
+                Conductor Ratio: 1 Conductor per Students
+                <input data-investor-input="conductorRatio" type="number" min="1" step="1" value="50" />
+              </label>
+              <label>
+                Conductor Cost
+                <input data-investor-input="conductorSalary" type="number" min="0" step="500" value="4000" />
+              </label>
+              <label>
+                Fuel Expense per Student
+                <input data-investor-input="fuelPerStudent" type="number" min="0" step="50" value="450" />
+              </label>
+              <label>
+                Guard Cost Monthly for <span data-scaled-students="guardCost">200</span> Students
+                <input data-investor-input="guardCost" data-scaled-cost="guardCost" type="number" min="0" step="500" value="16000" />
+              </label>
+              <label>
+                Admin Cost Monthly
+                <input data-investor-input="adminCost" type="number" min="0" step="500" value="15000" />
+              </label>
+              <label>
+                Principal Cost Monthly
+                <input data-investor-input="principalCost" type="number" min="0" step="500" value="35000" />
+              </label>
+              <label>
+                Electricity Cost Monthly
+                <input data-investor-input="electricityCost" type="number" min="0" step="500" value="5000" />
+              </label>
+              <label>
+                Gardner Cost
+                <input data-investor-input="gardenerCost" type="number" min="0" step="500" value="8000" />
+              </label>
+              <label>
+                Other Costs Monthly
+                <input data-investor-input="otherCost" type="number" min="0" step="500" value="5000" />
+              </label>
+              <label>
+                Buses Taxes & Insurances for <span data-scaled-students="busTaxInsurance">200</span> Students
+                <input data-investor-input="busTaxInsurance" data-scaled-cost="busTaxInsurance" type="number" min="0" step="500" value="20000" />
+              </label>
+              <label>
+                Audit Cost
+                <input data-investor-input="auditCost" type="number" min="0" step="500" value="3000" />
+              </label>
+              <label>
+                Affiliation Cost
+                <input data-investor-input="affiliationCost" type="number" min="0" step="500" value="12000" />
+              </label>
+              <label>
+                Marketing Cost
+                <input data-investor-input="marketingCost" type="number" min="0" step="500" value="3000" />
+              </label>
+              <label>
+                Software Cost
+                <input data-investor-input="softwareCost" type="number" min="0" step="500" value="20000" />
+              </label>
+            </div>
+          </form>
+
+          <div class="investor-results" aria-live="polite">
+            <div class="investor-hero-metric">
+              <span>Projected Annual Surplus</span>
+              <strong data-investor="profitAnnual">Rs. 0</strong>
+              <small><b data-investor="margin">0%</b> estimated annual margin</small>
+            </div>
+            <div class="investor-metric-grid">
+              <article><span>Monthly Revenue</span><strong data-investor="revenueMonthly">Rs. 0</strong></article>
+              <article><span>Monthly Cost</span><strong data-investor="expenseMonthly">Rs. 0</strong></article>
+              <article><span>Monthly Surplus</span><strong data-investor="profitMonthly">Rs. 0</strong></article>
+              <article><span>Annual Revenue</span><strong data-investor="revenueAnnual">Rs. 0</strong></article>
+            </div>
+          </div>
+        </div>
+
+        <div class="projection-breakdown">
+          <article class="projection-card investor-return-card">
+            <h3>Investor Return View</h3>
+            <div class="projection-table">
+              <span>Investor amount</span><strong data-investor="investorAmount">Rs. 50,00,000</strong>
+              <span>Equity offered</span><strong data-investor="investorEquity">3.5%</strong>
+              <span>Projected annual share</span><strong data-investor="investorAnnualShare">Rs. 0</strong>
+              <span>Projected monthly share</span><strong data-investor="investorMonthlyShare">Rs. 0</strong>
+              <span>Annual ROI</span><strong data-investor="annualRoi">0%</strong>
+              <span>Payback Period</span><strong data-investor="paybackYears">0 years</strong>
+            </div>
+          </article>
+
+          <article class="projection-card investor-story-card">
+            <h3>Why Invest in Stone Field School</h3>
+            <div class="investor-story-grid">
+              <span><b>Assured Student Pipeline</b> 100-150 confirmed students in Year 1 directly from Kidsverse School, with a guaranteed minimum 75 students every year post-Year 1 from the Kidsverse pipeline.</span>
+              <span><b>Guaranteed Revenue Base</b> Kidsverse Playschool and After School Rehan create a strong feeder ecosystem, supporting predictable student inflow and a more stable admissions funnel.</span>
+              <span><b>Financial Support</b> School transport is fully supported for the first 300 students, helping reduce early-stage pressure on the operating model.</span>
+              <span><b>Risk Reduction</b> Building loan and school transport EMI are covered till Phase 1, reducing investor financial burden during the launch and stabilization period.</span>
+              <span><b>Established Brand</b> Kidsverse is already a trusted education brand in the region, with a strong footprint across Fatehpur and Jawali backed by community reputation.</span>
+              <span><b>Market Presence</b> Active social media presence and community engagement are already driving a strong admissions funnel for future school growth.</span>
+              <span><b>Prime Admission Setup</b> SFIS admission office is located at After School Campus on the Rehan-Dhameta Highway, giving high visibility and easy access for parents.</span>
+              <span><b>Growing Catchment</b> The school serves a prime catchment zone with rising demand for quality, affordable, international-standard schooling close to home.</span>
+              <span><b>Operational Experience</b> Proven track record in running Kidsverse Playschool and after-school education systems gives SFIS a stronger launch foundation.</span>
+              <span><b>Experienced Leadership</b> Leadership brings 15+ years of corporate and education experience across TCS, HCL, UIDAI, and school operations.</span>
+              <span><b>Faculty Launch Support</b> Hiring support will be provided to ensure quality faculty onboarding and a smooth school launch.</span>
+              <span><b>Future-Ready Vision</b> SFIS is focused on 21st-century learning, AI and tech-enabled schooling, activity-based learning, leadership programs, and global exposure.</span>
+            </div>
+          </article>
+
+          <article class="projection-card">
+            <h3>Revenue Breakdown</h3>
+            <div class="projection-table">
+              <span>Monthly tuition collection</span><strong data-investor="tuitionMonthly">Rs. 0</strong>
+              <span>Monthly transport collection</span><strong data-investor="transportMonthly">Rs. 0</strong>
+              <span>Annual charges</span><strong data-investor="annualCharges">Rs. 0</strong>
+              <span>Admission fee collection</span><strong data-investor="admissionFees">Rs. 0</strong>
+              <span>Miscellaneous collection</span><strong data-investor="miscFees">Rs. 0</strong>
+            </div>
+          </article>
+
+          <article class="projection-card">
+            <h3>Cost Breakdown</h3>
+            <div class="projection-table">
+              <span>Teacher cost</span><strong data-investor="teacherCost">Rs. 0</strong>
+              <span>Support staff cost</span><strong data-investor="supportCost">Rs. 0</strong>
+              <span>Transport team + fuel</span><strong data-investor="transportCost">Rs. 0</strong>
+              <span>Cleaning staff cost</span><strong data-investor="cleaningCost">Rs. 0</strong>
+              <span>Fixed monthly operations</span><strong data-investor="fixedCost">Rs. 0</strong>
+            </div>
+          </article>
+
+          <article class="projection-card staffing-card">
+            <h3>Staffing Signals</h3>
+            <div class="staffing-grid">
+              <span><b data-investor="teacherCount">0</b> Teachers</span>
+              <span><b data-investor="supportCount">0</b> Support Staff</span>
+              <span><b data-investor="driverCount">0</b> Drivers</span>
+              <span><b data-investor="conductorCount">0</b> Conductors</span>
+              <span><b data-investor="cleaningCount">0</b> Cleaning Staff</span>
+              <span><b data-investor="expenseRatio">0%</b> Monthly Expense Ratio</span>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div>
+          <h3>Stone Field International School</h3>
+          <p>Private investor planning dashboard for projected revenue, cost, staffing, and surplus estimation.</p>
+        </div>
+        <div><strong>Planning Note</strong><span>Use this as an internal projection tool.</span><span>Final numbers should be reviewed before investor discussion.</span></div>
+        <div><strong>Website</strong><a href="index.html">Back to Home</a><a href="contact.html">Contact Team</a></div>
+      </div>
+      <div class="footer-bottom"><span>Stone Field International School</span><span>Investor projection dashboard.</span></div>
+      <div class="powered-by-tivoro"><a href="https://tivoro.in" target="_blank" rel="noopener noreferrer">Powered by Tivoro - Your digital growth partner</a></div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
