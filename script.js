@@ -31,6 +31,12 @@ const futureCompassReport = document.querySelector(".future-compass-report");
 const futureCompassDownload = document.querySelector("[data-fc-download]");
 const growthStudioButtons = document.querySelectorAll("[data-growth-focus]");
 const growthStudioStage = document.querySelector("[data-growth-stage]");
+const investorForm = document.querySelector(".investor-form");
+const investorStudentsInput = document.querySelector("#investorStudents");
+const investorEditableInputs = document.querySelectorAll("[data-investor-input]");
+const investorScaledCostInputs = document.querySelectorAll("[data-scaled-cost]");
+const investorScaledStudentLabels = document.querySelectorAll("[data-scaled-students]");
+const investorOutputs = document.querySelectorAll("[data-investor]");
 const whatsappNumber = "918826758881";
 const landingPopupSeenKey = "sfisLandingPopupSeen";
 const savedBlueprintKey = "sfisFutureSparkReport";
@@ -38,6 +44,37 @@ const blueprintGoogleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdX-9Ja
 const futureCompassGoogleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLScMaSwd0QQUIu2KrpGePXvI0ZkBcFv292iRS1KJUgWf0mg21g/formResponse";
 const pendingBlueprintLeadKey = "sfisPendingBlueprintLead";
 const pendingFutureCompassLeadKey = "sfisPendingFutureCompassLead";
+
+const investorAssumptions = {
+  monthlyFee: 3000,
+  transportFee: 1000,
+  annualCharge: 10000,
+  admissionFee: 12000,
+  miscFee: 2000,
+  teacherSalary: 15000,
+  teacherRatio: 30,
+  supportStaffSalary: 5000,
+  supportStaffRatio: 60,
+  driverSalary: 10000,
+  conductorSalary: 4000,
+  transportStaffRatio: 50,
+  driverRatio: 50,
+  conductorRatio: 50,
+  fuelPerStudent: 450,
+  guardCost: 16000,
+  adminCost: 15000,
+  principalCost: 35000,
+  electricityCost: 5000,
+  gardenerCost: 8000,
+  otherCost: 5000,
+  busTaxInsurance: 20000,
+  cleaningStaffSalary: 5000,
+  cleaningStaffRatio: 60,
+  auditCost: 3000,
+  affiliationCost: 12000,
+  marketingCost: 3000,
+  softwareCost: 20000,
+};
 
 const growthStudioData = {
   stem: {
@@ -103,6 +140,239 @@ const parentBotQuickQuestions = [
   "What is Future Explorer Challenge?",
   "Do you have parent resources?",
 ];
+
+function formatInvestorCurrency(value) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(Math.round(value || 0));
+}
+
+function formatInvestorDecimal(value) {
+  return new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 1,
+  }).format(value || 0);
+}
+
+function setInvestorOutput(key, value) {
+  investorOutputs.forEach((output) => {
+    if (output.dataset.investor === key) {
+      output.textContent = value;
+    }
+  });
+}
+
+function getInvestorAssumption(key) {
+  const input = document.querySelector(`[data-investor-input="${key}"]`);
+  if (!input) return investorAssumptions[key] || 0;
+  const value = Number.parseFloat(input.value);
+  return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
+function getInvestorStudents() {
+  if (!investorStudentsInput || investorStudentsInput.value === "") return 0;
+  return Math.max(0, Number.parseInt(investorStudentsInput.value, 10) || 0);
+}
+
+function updateScaledInvestorCostFields() {
+  const students = getInvestorStudents();
+  const multiplier = students ? students / 200 : 0;
+
+  investorScaledStudentLabels.forEach((label) => {
+    label.textContent = students || 0;
+  });
+
+  investorScaledCostInputs.forEach((input) => {
+    const key = input.dataset.scaledCost;
+    const baseValue = investorAssumptions[key] || 0;
+    input.value = Math.round(baseValue * multiplier);
+  });
+}
+
+function getInvestorEquity(amount) {
+  if (amount >= 10000000) return 8.5;
+  return 3.5;
+}
+
+function calculateInvestorProjection(students) {
+  const a = {
+    ...investorAssumptions,
+    monthlyFee: getInvestorAssumption("monthlyFee"),
+    transportFee: getInvestorAssumption("transportFee"),
+    annualCharge: getInvestorAssumption("annualCharge"),
+    admissionFee: getInvestorAssumption("admissionFee"),
+    teacherSalary: getInvestorAssumption("teacherSalary"),
+    teacherRatio: getInvestorAssumption("teacherRatio") || investorAssumptions.teacherRatio,
+    supportStaffSalary: getInvestorAssumption("supportStaffSalary"),
+    supportStaffRatio: getInvestorAssumption("supportStaffRatio") || investorAssumptions.supportStaffRatio,
+    cleaningStaffSalary: getInvestorAssumption("cleaningStaffSalary"),
+    cleaningStaffRatio: getInvestorAssumption("cleaningStaffRatio") || investorAssumptions.cleaningStaffRatio,
+    driverSalary: getInvestorAssumption("driverSalary"),
+    driverRatio: getInvestorAssumption("driverRatio") || investorAssumptions.driverRatio,
+    conductorSalary: getInvestorAssumption("conductorSalary"),
+    conductorRatio: getInvestorAssumption("conductorRatio") || investorAssumptions.conductorRatio,
+    fuelPerStudent: getInvestorAssumption("fuelPerStudent"),
+    guardCost: getInvestorAssumption("guardCost"),
+    adminCost: getInvestorAssumption("adminCost"),
+    principalCost: getInvestorAssumption("principalCost"),
+    electricityCost: getInvestorAssumption("electricityCost"),
+    gardenerCost: getInvestorAssumption("gardenerCost"),
+    otherCost: getInvestorAssumption("otherCost"),
+    busTaxInsurance: getInvestorAssumption("busTaxInsurance"),
+    auditCost: getInvestorAssumption("auditCost"),
+    affiliationCost: getInvestorAssumption("affiliationCost"),
+    marketingCost: getInvestorAssumption("marketingCost"),
+    softwareCost: getInvestorAssumption("softwareCost"),
+  };
+  const investorAmount = getInvestorAssumption("investorPlan") || 5000000;
+  const investorEquity = getInvestorEquity(investorAmount);
+  const tuitionMonthly = students * a.monthlyFee;
+  const transportMonthly = students * a.transportFee;
+  const annualCharges = students * a.annualCharge;
+  const admissionFees = students * a.admissionFee;
+  const miscFees = students * a.miscFee;
+  const revenueMonthly = tuitionMonthly + transportMonthly;
+  const revenueAnnual = revenueMonthly * 12 + annualCharges + admissionFees + miscFees;
+
+  const teacherCount = students / a.teacherRatio;
+  const supportCount = students / a.supportStaffRatio;
+  const driverCount = students / a.driverRatio;
+  const conductorCount = students / a.conductorRatio;
+  const cleaningCount = students / a.cleaningStaffRatio;
+
+  const teacherCost = teacherCount * a.teacherSalary;
+  const supportCost = supportCount * a.supportStaffSalary;
+  const driverCost = driverCount * a.driverSalary;
+  const conductorCost = conductorCount * a.conductorSalary;
+  const fuelCost = students * a.fuelPerStudent;
+  const cleaningCost = cleaningCount * a.cleaningStaffSalary;
+  const fixedCost =
+    a.guardCost +
+    a.adminCost +
+    a.principalCost +
+    a.electricityCost +
+    a.gardenerCost +
+    a.otherCost +
+    a.busTaxInsurance +
+    a.auditCost +
+    a.affiliationCost +
+    a.marketingCost +
+    a.softwareCost;
+  const transportCost = driverCost + conductorCost + fuelCost;
+  const expenseMonthly = teacherCost + supportCost + transportCost + cleaningCost + fixedCost;
+  const expenseAnnual = expenseMonthly * 12;
+  const profitMonthly = revenueMonthly - expenseMonthly;
+  const profitAnnual = revenueAnnual - expenseAnnual;
+  const margin = revenueAnnual ? (profitAnnual / revenueAnnual) * 100 : 0;
+  const expenseRatio = revenueMonthly ? (expenseMonthly / revenueMonthly) * 100 : 0;
+  const investorAnnualShare = profitAnnual * (investorEquity / 100);
+  const investorMonthlyShare = investorAnnualShare / 12;
+  const impliedValuation = investorEquity ? investorAmount / (investorEquity / 100) : 0;
+  const annualRoi = investorAmount ? (investorAnnualShare / investorAmount) * 100 : 0;
+  const paybackYears = investorAnnualShare > 0 ? investorAmount / investorAnnualShare : 0;
+
+  return {
+    investorAmount,
+    investorEquity,
+    investorAnnualShare,
+    investorMonthlyShare,
+    impliedValuation,
+    annualRoi,
+    paybackYears,
+    tuitionMonthly,
+    transportMonthly,
+    annualCharges,
+    admissionFees,
+    miscFees,
+    revenueMonthly,
+    revenueAnnual,
+    teacherCount,
+    supportCount,
+    driverCount,
+    conductorCount,
+    cleaningCount,
+    teacherCost,
+    supportCost,
+    transportCost,
+    cleaningCost,
+    fixedCost,
+    expenseMonthly,
+    expenseAnnual,
+    profitMonthly,
+    profitAnnual,
+    margin,
+    expenseRatio,
+  };
+}
+
+function renderInvestorProjection() {
+  if (!investorStudentsInput) return;
+  if (investorStudentsInput.value === "") {
+    updateScaledInvestorCostFields();
+    investorOutputs.forEach((output) => {
+      output.textContent = output.dataset.investor?.includes("Count") ? "0" : "Rs. 0";
+    });
+    setInvestorOutput("margin", "0%");
+    setInvestorOutput("expenseRatio", "0%");
+    return;
+  }
+  updateScaledInvestorCostFields();
+  const students = getInvestorStudents();
+  const projection = calculateInvestorProjection(students);
+
+  setInvestorOutput("profitAnnual", formatInvestorCurrency(projection.profitAnnual));
+  setInvestorOutput("margin", `${formatInvestorDecimal(projection.margin)}%`);
+  setInvestorOutput("investorAmount", formatInvestorCurrency(projection.investorAmount));
+  setInvestorOutput("investorEquity", `${formatInvestorDecimal(projection.investorEquity)}%`);
+  setInvestorOutput("investorAnnualShare", formatInvestorCurrency(projection.investorAnnualShare));
+  setInvestorOutput("investorMonthlyShare", formatInvestorCurrency(projection.investorMonthlyShare));
+  setInvestorOutput("impliedValuation", formatInvestorCurrency(projection.impliedValuation));
+  setInvestorOutput("annualRoi", `${formatInvestorDecimal(projection.annualRoi)}%`);
+  setInvestorOutput("paybackYears", projection.paybackYears ? `${formatInvestorDecimal(projection.paybackYears)} years` : "Not recoverable");
+  setInvestorOutput("revenueMonthly", formatInvestorCurrency(projection.revenueMonthly));
+  setInvestorOutput("expenseMonthly", formatInvestorCurrency(projection.expenseMonthly));
+  setInvestorOutput("profitMonthly", formatInvestorCurrency(projection.profitMonthly));
+  setInvestorOutput("revenueAnnual", formatInvestorCurrency(projection.revenueAnnual));
+  setInvestorOutput("tuitionMonthly", formatInvestorCurrency(projection.tuitionMonthly));
+  setInvestorOutput("transportMonthly", formatInvestorCurrency(projection.transportMonthly));
+  setInvestorOutput("annualCharges", formatInvestorCurrency(projection.annualCharges));
+  setInvestorOutput("admissionFees", formatInvestorCurrency(projection.admissionFees));
+  setInvestorOutput("miscFees", formatInvestorCurrency(projection.miscFees));
+  setInvestorOutput("teacherCost", formatInvestorCurrency(projection.teacherCost));
+  setInvestorOutput("supportCost", formatInvestorCurrency(projection.supportCost));
+  setInvestorOutput("transportCost", formatInvestorCurrency(projection.transportCost));
+  setInvestorOutput("cleaningCost", formatInvestorCurrency(projection.cleaningCost));
+  setInvestorOutput("fixedCost", formatInvestorCurrency(projection.fixedCost));
+  setInvestorOutput("teacherCount", formatInvestorDecimal(projection.teacherCount));
+  setInvestorOutput("supportCount", formatInvestorDecimal(projection.supportCount));
+  setInvestorOutput("driverCount", formatInvestorDecimal(projection.driverCount));
+  setInvestorOutput("conductorCount", formatInvestorDecimal(projection.conductorCount));
+  setInvestorOutput("cleaningCount", formatInvestorDecimal(projection.cleaningCount));
+  setInvestorOutput("expenseRatio", `${formatInvestorDecimal(projection.expenseRatio)}%`);
+}
+
+investorForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  renderInvestorProjection();
+});
+
+investorStudentsInput?.addEventListener("input", renderInvestorProjection);
+investorEditableInputs.forEach((input) => {
+  input.addEventListener("input", () => {
+    const scaledKey = input.dataset.scaledCost;
+    if (scaledKey) {
+      const students = getInvestorStudents();
+      const multiplier = students ? students / 200 : 1;
+      const enteredValue = Number.parseFloat(input.value);
+      if (Number.isFinite(enteredValue) && multiplier > 0) {
+        investorAssumptions[scaledKey] = enteredValue / multiplier;
+      }
+    }
+    renderInvestorProjection();
+  });
+});
+renderInvestorProjection();
 
 const parentBotAnswers = [
   {
