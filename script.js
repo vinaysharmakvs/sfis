@@ -37,6 +37,8 @@ const investorEditableInputs = document.querySelectorAll("[data-investor-input]"
 const investorScaledCostInputs = document.querySelectorAll("[data-scaled-cost]");
 const investorScaledStudentLabels = document.querySelectorAll("[data-scaled-students]");
 const investorOutputs = document.querySelectorAll("[data-investor]");
+const investorGrowthChart = document.querySelector("[data-investor-growth-chart]");
+const investorGrowthTable = document.querySelector("[data-investor-growth-table]");
 const whatsappNumber = "918826758881";
 const landingPopupSeenKey = "sfisLandingPopupSeen";
 const savedBlueprintKey = "sfisFutureSparkReport";
@@ -306,10 +308,93 @@ function calculateInvestorProjection(students) {
   };
 }
 
+function renderInvestorGrowthProjection(baseStudents) {
+  if (!investorGrowthChart || !investorGrowthTable) return;
+  if (!baseStudents) {
+    investorGrowthChart.innerHTML = "";
+    investorGrowthTable.innerHTML = '<tr><td colspan="9">Enter projected students to view year-wise analytics.</td></tr>';
+    return;
+  }
+
+  const baseYear = 2027;
+  const targetStudents = 1100;
+  const annualStudentGrowth = 100;
+  const revenueGrowthRate = 1.05;
+  const expenseGrowthRate = 1.02;
+  const rows = [];
+  const investorAmount = getInvestorAssumption("investorPlan") || 5000000;
+  const investorEquity = getInvestorEquity(investorAmount);
+  const investmentType = investorAmount >= 10000000 ? "Rs. 1 Cr - 8.5%" : "Rs. 50 Lac - 3.5%";
+  const annualStudentCollection =
+    getInvestorAssumption("annualCharge") +
+    getInvestorAssumption("admissionFee") +
+    investorAssumptions.miscFee;
+  let cumulativeInvestorShare = 0;
+  let recoveryYear = "";
+
+  for (let students = baseStudents, index = 0; students <= targetStudents; students += annualStudentGrowth, index += 1) {
+    const projection = calculateInvestorProjection(students);
+    const newStudentsForAnnualCollection = index === 0 ? students : annualStudentGrowth;
+    const recurringAnnualRevenue = projection.revenueMonthly * 12;
+    const oneTimeAnnualRevenue = newStudentsForAnnualCollection * annualStudentCollection;
+    const revenueAnnual = (recurringAnnualRevenue + oneTimeAnnualRevenue) * revenueGrowthRate ** index;
+    const expenseAnnual = projection.expenseAnnual * expenseGrowthRate ** index;
+    const profitAnnual = revenueAnnual - expenseAnnual;
+    const investorShare = profitAnnual * (investorEquity / 100);
+    const annualRoi = investorAmount ? (investorShare / investorAmount) * 100 : 0;
+    cumulativeInvestorShare += investorShare;
+    const recoveredThisYear = !recoveryYear && cumulativeInvestorShare >= investorAmount;
+    if (recoveredThisYear) recoveryYear = String(baseYear + index);
+    rows.push({
+      year: baseYear + index,
+      students,
+      investmentType,
+      revenueAnnual,
+      expenseAnnual,
+      profitAnnual,
+      investorShare,
+      annualRoi,
+      cumulativeInvestorShare,
+      principalStatus: recoveredThisYear
+        ? `Recovered in ${baseYear + index}`
+        : recoveryYear
+          ? "Recovered"
+          : `${formatInvestorDecimal((cumulativeInvestorShare / investorAmount) * 100)}% recovered`,
+    });
+  }
+
+  const maxStudents = Math.max(...rows.map((row) => row.students));
+  investorGrowthChart.innerHTML = rows
+    .map((row) => {
+      const height = Math.max(18, (row.students / maxStudents) * 100);
+      return `<div class="growth-bar-item"><span style="height:${height}%"></span><b>${row.year}</b><small>${row.students}</small></div>`;
+    })
+    .join("");
+
+  investorGrowthTable.innerHTML = rows
+    .map(
+      (row) => `
+        <tr>
+          <td>${row.year}</td>
+          <td>${row.students}</td>
+          <td>${row.investmentType}</td>
+          <td>${formatInvestorCurrency(row.revenueAnnual)}</td>
+          <td>${formatInvestorCurrency(row.expenseAnnual)}</td>
+          <td>${formatInvestorCurrency(row.profitAnnual)}</td>
+          <td>${formatInvestorCurrency(row.investorShare)}</td>
+          <td>${formatInvestorDecimal(row.annualRoi)}%</td>
+          <td>${row.principalStatus}</td>
+        </tr>
+      `
+    )
+    .join("");
+}
+
 function renderInvestorProjection() {
   if (!investorStudentsInput) return;
   if (investorStudentsInput.value === "") {
     updateScaledInvestorCostFields();
+    renderInvestorGrowthProjection(0);
     investorOutputs.forEach((output) => {
       output.textContent = output.dataset.investor?.includes("Count") ? "0" : "Rs. 0";
     });
@@ -320,6 +405,7 @@ function renderInvestorProjection() {
   updateScaledInvestorCostFields();
   const students = getInvestorStudents();
   const projection = calculateInvestorProjection(students);
+  renderInvestorGrowthProjection(students);
 
   setInvestorOutput("profitAnnual", formatInvestorCurrency(projection.profitAnnual));
   setInvestorOutput("margin", `${formatInvestorDecimal(projection.margin)}%`);
